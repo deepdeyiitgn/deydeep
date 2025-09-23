@@ -44,7 +44,7 @@ I strongly believe in **discipline, focus, and the power of consistency**—ever
 1. **Clone the Repo**
 
 ```bash
-git clone https://github.com/deepdeyiitgn/deepdey.git
+git clone https://github.com/deepdeyiitgn/deydeep.git
 cd deepdey
 ```
 
@@ -64,7 +64,7 @@ To deploy your website hosted on GitHub Pages, follow these steps:
 1. **Clone your repository** (if you haven't already):
 
    ```bash
-   git clone https://github.com/deepdeyiitgn/deepdey.git
+   git clone https://github.com/deepdeyiitgn/deydeep.git
    cd deepdey
    ```
 
@@ -85,7 +85,7 @@ To deploy your website hosted on GitHub Pages, follow these steps:
 
 ### ✅ Step 2: Enable GitHub Pages
 
-1. **Navigate to your repository**: [https://github.com/deepdeyiitgn/deepdey](https://github.com/deepdeyiitgn/deepdey)
+1. **Navigate to your repository**: [https://github.com/deepdeyiitgn/deydeep](https://github.com/deepdeyiitgn/deydeep)
 
 2. **Go to Settings** (⚙️ icon).
 
@@ -102,7 +102,7 @@ To deploy your website hosted on GitHub Pages, follow these steps:
 After a few minutes, your site will be live at:
 
 ```
-https://deepdeyiitgn.github.io/deepdey/
+https://[username].github.io/deydeep/
 ```
 
 ---
