@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You – Deep Dey</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    background: #0f0f2a;
+    color: #f5f5f7;
+    text-align: center;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Blobs & sparkles */
+  .bg-blob { position: fixed; z-index: 0; pointer-events: none; opacity: 0.45; filter: blur(8px) saturate(1.2); animation: blobMove 18s ease-in-out infinite alternate; }
+  .bg-blob1 { left: -120px; top: -80px; width: 350px; height: 350px; animation-delay: 0s; fill: #ffb6ea; }
+  .bg-blob2 { left: 60vw; top: 10vh; width: 420px; height: 420px; animation-delay: 2s; fill: #a1c4fd; }
+  .bg-blob3 { left: 10vw; top: 60vh; width: 320px; height: 320px; animation-delay: 4s; fill: #baf7d8; }
+  @keyframes blobMove { 0%{transform:scale(1) translate(0,0) rotate(0deg);}50%{transform:scale(1.12) translate(30px,40px) rotate(20deg);}100%{transform:scale(1) translate(0,0) rotate(0deg);} }
+
+  .sparkle { position: fixed; z-index: 1; pointer-events: none; opacity: 0.7; animation: sparkleMove 7s linear infinite; }
+  .sparkle1 { left: 20vw; top: 30vh; animation-delay:0s; fill:#ffd60a; }
+  .sparkle2 { left: 80vw; top: 70vh; animation-delay:2s; fill:#3a0ca3; }
+  .sparkle3 { left:50vw; top:10vh; animation-delay:4s; fill:#ffb6ea; }
+  @keyframes sparkleMove {0%{opacity:0.7; transform:scale(1) rotate(0deg);}50%{opacity:1; transform:scale(1.2) rotate(180deg);}100%{opacity:0.7; transform:scale(1) rotate(360deg);}}
+
+  .thankyou-container {
+    max-width: 700px;
+    margin: 80px auto;
+    background: rgba(15,15,42,0.75);
+    border-radius: 32px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    padding: 60px 40px;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(18px) saturate(1.5);
+    border: 3px solid;
+    border-image: linear-gradient(120deg,#ffb6ea,#a1c4fd,#baf7d8,#fbc2eb,#a1c4fd) 1;
+    animation: glassFadeIn 1.2s;
+    overflow: hidden;
+  }
+
+  @keyframes glassFadeIn { from{opacity:0; transform:scale(0.97);} to{opacity:1; transform:scale(1);} }
+
+  h1 {
+    font-size:2.8rem; font-weight:700; margin-bottom:20px;
+    color:#ffd60a; letter-spacing:1px;
+    animation: fadeInDown 1s;
+    text-shadow:0 2px 12px #3a0ca3,0 0 8px #ffb6ea;
+  }
+  @keyframes fadeInDown { from{opacity:0; transform:translateY(-40px);} to{opacity:1; transform:translateY(0);} }
+
+  .thankyou-message {
+    font-size:1.25rem; margin-bottom:50px; font-weight:500;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay:0.5s; opacity:0; color:#f5f5f7;
+  }
+  .thankyou-message span { color:#ffd60a; font-weight:600; }
+
+  @keyframes fadeInUp { 0%{opacity:0; transform:translateY(50px);} 100%{opacity:1; transform:translateY(0);} }
+
+  .cta-buttons { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; animation:fadeInUp 1s ease forwards; animation-delay:1s; opacity:0; margin-bottom:10px; }
+  .cta-buttons a {
+    background: linear-gradient(90deg,#ffb6ea 0%,#a1c4fd 50%,#3a0ca3 100%);
+    color:#fff; padding:18px 35px; border-radius:30px; font-weight:700; text-decoration:none; font-size:1.1rem;
+    transition: all 0.3s ease; box-shadow:0 4px 16px rgba(67,97,238,0.12); position:relative; overflow:hidden; outline:2px solid #fff0;
+  }
+  .cta-buttons a:after {
+    content:''; position:absolute; left:-75%; top:0; width:50%; height:100%; background:linear-gradient(120deg,rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.1) 100%);
+    transform:skewX(-20deg); transition:left 0.4s cubic-bezier(.4,0,.2,1); z-index:1;
+  }
+  .cta-buttons a:hover:after { left:120%; }
+  .cta-buttons a:hover { transform: scale(1.08) rotate(-2deg); box-shadow:0 8px 32px rgba(67,97,238,0.18); background:linear-gradient(90deg,#3a0ca3 0%,#a1c4fd 50%,#ffb6ea 100%); outline:2px solid #ffd6f6; }
+</style>
+</head>
+<body>
+
+<!-- Animated background blobs -->
+<svg class="bg-blob bg-blob1" viewBox="0 0 600 600"><path/></svg>
+<svg class="bg-blob bg-blob2" viewBox="0 0 600 600"><path/></svg>
+<svg class="bg-blob bg-blob3" viewBox="0 0 600 600"><path/></svg>
+<svg class="sparkle sparkle1" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="2" fill="#ffd60a"></circle></svg>
+<svg class="sparkle sparkle2" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="#3a0ca3"></circle></svg>
+<svg class="sparkle sparkle3" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="1" fill="#ffb6ea"></circle></svg>
+
+<!-- Navbar/Header for Consistency -->
+<nav class="navbar">
+  <div class="logo">Deep Dey</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About Me</a></li>
+    <li><a href="portfolio.html">Portfolio</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="donate.html">Donate Me!</a></li>
+  </ul>
+  <div class="menu-toggle">&#9776;</div>
+</nav>
+
+<div class="thankyou-container">
+  <h1 style="font-size:3.2rem;color:#ffd60a;text-shadow:0 2px 12px #3a0ca3,0 0 8px #ffb6ea;">Thank You! You’re Amazing! 🎉</h1>
+  <div class="thankyou-message" style="font-size:1.45rem;">
+    Your support means the world to me.<br>
+    <span>You’re inspiring a whole community of dreamers and doers!</span><br><br>
+    Every contribution brings us closer to new goals and brighter futures. <span>Stay awesome!</span><br><br>
+    <b>Special shoutout to all supporters:</b> <br>
+    <span style="color:#a1c4fd;">You help keep this journey honest, ad-free, and full of hope for every JEE aspirant.</span>
+  </div>
+  <div style="margin:32px 0;">
+    <h2 style="font-size:2rem;color:#ffd60a;">Supporter Highlights</h2>
+    <ul style="list-style:none;padding:0;font-size:1.18rem;max-width:600px;margin:0 auto;">
+      <li style="margin-bottom:12px;"><b>Student:</b> “I felt so motivated after seeing my name on the supporter wall!”</li>
+      <li style="margin-bottom:12px;"><b>Parent:</b> “Thank you for making learning accessible and fun for my child.”</li>
+      <li><b>Peer:</b> “Deep’s thank you page is the most wholesome thing on the internet!”</li>
+    </ul>
+  </div>
+<div class="cta-buttons">
+  <a href="index.html">Go Back Home</a>
+  <a href="https://www.deepdeyiitk.com">Visit My Website</a>
+  <a href="https://www.deepdeyiitk.com/contactus">Contact Me</a>
+</div>
+  <canvas class="confetti"></canvas>
+</div>
+
+<script>
+const confetti=document.querySelector('.confetti');
+const ctx=confetti.getContext('2d');
+let W=window.innerWidth,H=window.innerHeight;
+confetti.width=W;confetti.height=H;
+let pieces=[];
+const colors=['#ffd60a','#3a0ca3','#ffb6ea','#a1c4fd','#baf7d8','#fbc2eb','#00ff99'];
+for(let i=0;i<90;i++){pieces.push({x:Math.random()*W,y:Math.random()*-H,r:6+Math.random()*10,d:10+Math.random()*20,color:colors[Math.floor(Math.random()*colors.length)],tilt:Math.random()*10-10,tiltAngle:0,tiltAngleInc:(Math.random()*0.07)+.05});}
+function drawConfetti(){ctx.clearRect(0,0,W,H);for(let i=0;i<pieces.length;i++){let p=pieces[i];ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+Math.sin(p.tiltAngle)*15,p.y);ctx.lineTo(p.x,p.y+p.tilt+p.r);ctx.stroke();}updateConfetti();}
+function updateConfetti(){for(let i=0;i<pieces.length;i++){let p=pieces[i];p.y+=(Math.cos(p.d)+3+p.r/2)/2;p.x+=Math.sin(0.01*p.d);p.tiltAngle+=p.tiltAngleInc;p.tilt=Math.sin(p.tiltAngle)*15;if(p.y>H){p.x=Math.random()*W;p.y=-10;}}}
+function animate(){drawConfetti();requestAnimationFrame(animate);}
+animate();
+window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight;confetti.width=W;confetti.height=H;});
+</script>
+<!-- Project Footer for Consistency -->
+<footer>
+  <div style="margin-bottom:12px;">
+    <img src="https://www.deepdeyiitk.com/web/image/website/1/logo/Deep%20Dey%20-%20The%20FUTURE%20IITIAN%20%F0%9F%8E%AF%20?unique=e5fe8cd" alt="Deep Dey Logo" style="height:48px;width:auto;vertical-align:middle;">
+  </div>
+  <p>&copy; 2025 Deep Dey | All rights reserved</p>
+  <div class="footer-social">
+    <a href="https://github.com/deepdeyiitgn" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;background:#24292f;color:#fff;font-weight:700;transition:background 0.3s,transform 0.2s;" onmouseover="this.style.background='#444d56';this.style.transform='scale(1.07)';" onmouseout="this.style.background='#24292f';this.style.transform='scale(1)';"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub" style="width:20px;height:20px;vertical-align:middle;">GitHub</a>
+    <a href="https://github.com/deepdeyiitgn/deepdey" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#ffb6ea 0%,#a1c4fd 100%);color:#24292f;font-weight:700;transition:background 0.3s,transform 0.2s;" onmouseover="this.style.background='linear-gradient(90deg,#a1c4fd 0%,#ffb6ea 100%)';this.style.transform='scale(1.07)';" onmouseout="this.style.background='linear-gradient(90deg,#ffb6ea 0%,#a1c4fd 100%)';this.style.transform='scale(1)';"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="Project Repo" style="width:20px;height:20px;vertical-align:middle;">Project Repo</a>
+    <a href="https://www.linkedin.com/in/deepdeyiitgn" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;background:#0077b5;color:#fff;font-weight:700;transition:background 0.3s,transform 0.2s;" onmouseover="this.style.background='#005983';this.style.transform='scale(1.07)';" onmouseout="this.style.background='#0077b5';this.style.transform='scale(1)';"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" style="width:20px;height:20px;vertical-align:middle;">LinkedIn</a>
+    <a href="https://www.instagram.com/deepdey.official/" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fd5,#f15,#c13584,#833ab4);color:#fff;font-weight:700;transition:background 0.3s,transform 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,#833ab4,#c13584,#f15,#fd5)';this.style.transform='scale(1.07)';" onmouseout="this.style.background='linear-gradient(135deg,#fd5,#f15,#c13584,#833ab4)';this.style.transform='scale(1)';"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:20px;height:20px;vertical-align:middle;">Instagram</a>
+    <a href="https://www.deepdeyiitk.com" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#ffd60a 0%,#3a0ca3 100%);color:#0f0f2a;font-weight:700;transition:background 0.3s,transform 0.2s;" onmouseover="this.style.background='linear-gradient(90deg,#3a0ca3 0%,#ffd60a 100%)';this.style.transform='scale(1.07)';" onmouseout="this.style.background='linear-gradient(90deg,#ffd60a 0%,#3a0ca3 100%)';this.style.transform='scale(1)';"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/link.svg" alt="Website" style="width:20px;height:20px;vertical-align:middle;">Website</a>
+  </div>
+</footer>
+</body>
+</html>
