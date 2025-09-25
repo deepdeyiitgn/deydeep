@@ -192,3 +192,14 @@ function throttle(fn, wait) {
     }
   };
 }
+
+// =======================
+// Blocker: Block CTRL + U
+// =======================
+  document.addEventListener('keydown', function(e) {
+    // Check if the Ctrl key is pressed and the key is 'u'
+    if (e.ctrlKey && e.key === 'u') {
+      // Prevent the default action (opening the source view)
+      e.preventDefault();
+    }
+  });
