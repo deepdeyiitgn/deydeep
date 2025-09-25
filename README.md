@@ -95,6 +95,18 @@ To deploy your website hosted on GitHub Pages, follow these steps:
 
 5. **Click "Save"**.
 
+6. **Make Sure "Add" the below code in all html files head or body area!**.
+
+```
+<script src="verify.js"></script>
+<script>
+  protectPage(); // agar user verified nahi hai, redirect index.html
+</script>
+
+// Har HTML file me isko include karo <head> ya <body> mei
+// Include this in every HTML file in <head> or <body>
+```
+
 ---
 
 ### ✅ Step 3: Access Your Live Website
