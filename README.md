@@ -288,7 +288,7 @@ git clone https://github.com/deepdeyiitgn/support-page-deepdeyiitk.com.git
 * **Redirect URL variable (top of `<script>`):**
 
 ```javascript
-const REDIRECT_TARGET = "https://docs.google.com/forms/d/e/1FAIpQLSdqcVijtxP2qtiwFtuS-NFBL9_Pnbf6WwiydLnzh4nbxQWy1Q/viewform";
+const REDIRECT_TARGET = "home.html";
 ```
 
 * **Session Detection Logic:**
