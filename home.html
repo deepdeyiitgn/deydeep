@@ -11,24 +11,26 @@
 <script>
   protectPage(); // agar user verified nahi hai, redirect index.html
 </script>
-  <style>
+ <style>
 .typewriter {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
   border-right: 2px solid currentColor;
-  animation: 
-    typing 3s steps(16, end) infinite,
-    blink-caret .75s step-end infinite;
+  width: 0; /* shuruat me text hidden */
+  animation: typing 4s steps(16, end) infinite,
+             blink-caret 0.7s step-end infinite;
 }
 
+/* text type + erase */
 @keyframes typing {
   0%   { width: 0 }
-  40%  { width: 16ch } /* characters count: "Hi, I'm Deep Dey" */
-  60%  { width: 16ch }
-  100% { width: 0 }
+  40%  { width: 16ch } /* text appear hoga */
+  60%  { width: 16ch } /* thoda rukega */
+  100% { width: 0 }    /* erase hoke fir loop karega */
 }
 
+/* caret blink */
 @keyframes blink-caret {
   from, to { border-color: transparent }
   50%      { border-color: currentColor }
@@ -64,7 +66,7 @@
 <section class="hero">
   <div class="hero-content">
     <img src="https://www.deepdeyiitk.com/web/image/website/1/logo/Deep%20Dey%20-%20The%20FUTURE%20IITIAN%20%F0%9F%8E%AF%20?unique=e5fe8cd" alt="Deep Dey" class="avatar" style="border-radius:50%;box-shadow:0 8px 40px #3a0ca3,0 0 24px #ffb6ea;max-width:180px;margin-bottom:24px;">
-<h1 class="big-heading typewriter" style="letter-spacing:1px;animation:fadeInDown 1s;">Hi, I'm Deep Dey</h1>
+    <h1 class="big-heading typewriter" style="letter-spacing:1px;animation:fadeInDown 1s;">Hi, I'm Deep Dey</h1>
     <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=3000&pause=800&color=3A0CA3&center=true&vCenter=true&width=450&lines=JEE+2027+Aspirant;AI+%2B+Prompt+Engineering+Enthusiast;Web+%26+App+Innovator;Consistent+5AM+Study+Streaks" alt="Typing SVG">
 </p>
   <p class="hero-desc" style="font-size:1.35rem;max-width:700px;margin:0 auto 24px auto;animation:fadeInUp 1.2s;">Aspiring IITian, AI enthusiast & coder, blending tech with creativity. I love building AI-assisted projects, creating YouTube content, and sharing my knowledge with the world. <br><span style="color:#ffd60a;font-weight:600;">Join my journey to IIT Kanpur and beyond!</span></p>
