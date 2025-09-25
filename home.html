@@ -38,6 +38,17 @@
   0%   { opacity: 0; transform: translateY(-20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+        /* Hide the container by default (on all screen sizes) */
+    .hide-on-mobile {
+      display: none;
+    }
+
+    /* Make the container visible only on larger screens */
+    @media (min-width: 768px) { /* Adjust '768px' to your desired breakpoint */
+      .desktop-only-container {
+        display: block; /* Or grid, flex, etc., depending on your layout */
+      }
+    }
   </style>
 </head>
 
@@ -167,11 +178,16 @@
   <p align="center">
   <em>Made with ❤️, AI power, and relentless focus by <b>Deep Dey</b></em>
 </p>
-
+    </div>
+  <div>
+    <div class="hide-on-mobile desktop-only-container">
+      <!-- Content to hide on mobile -->
+    
 <p align="center">
   <img src="https://raw.githubusercontent.com/Anuj579/Anuj579/output/github-contribution-grid-snake-dark.svg" alt="Snake animation" />
 </p>
-</div>
+      </div>
+    </div>
     
 <!-- Footer -->
 <footer>
