@@ -5,7 +5,7 @@
 const STORAGE_KEY = 'gh_verify_token_v1';
 const TOKEN_HOURS = 6; // Token validity in hours
 const REDIRECT_FILE = 'dd.html';
-const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdqcVijtxP2qtiwFtuS-NFBL9_Pnbf6WwiydLnzh4nbxQWy1Q/viewform';
+const FORM_URL = 'home.html';
 
 /* ---------------- Utility Functions ---------------- */
 function nowMs() { return Date.now(); }
