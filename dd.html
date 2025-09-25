@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redirecting…</title>
+  <style>
+    body { display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#f0f4f7; }
+    .box { text-align:center; background:#fff; padding:30px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15);}
+    .error { color:#d33; margin-top:12px; }
+    .timer { margin-top:8px; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Redirecting…</h2>
+    <div id="message"></div>
+    <div id="timer" class="timer"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'gh_verify_token_v1';
+    const REDIRECT_TARGET = 'https://docs.google.com/forms/d/e/1FAIpQLSdqcVijtxP2qtiwFtuS-NFBL9_Pnbf6WwiydLnzh4nbxQWy1Q/viewform';
+    const timerEl = document.getElementById('timer');
+    const msgEl = document.getElementById('message');
+
+    function nowMs() { return Date.now(); }
+
+    function isVerified() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const obj = JSON.parse(atob(raw));
+        if (!obj.exp || nowMs() > obj.exp) return false;
+        return true;
+      } catch { return false; }
+    }
+
+    function redirect() {
+      location.href = REDIRECT_TARGET;
+    }
+
+    if (isVerified()) {
+      msgEl.textContent = 'Session valid — Redirecting…';
+      setTimeout(redirect, 500);
+    } else {
+      msgEl.innerHTML = '<span class="error">Error: Verification missing!</span>';
+      let t = 7;
+      timerEl.textContent = `Redirecting to verification in ${t} seconds…`;
+      const interval = setInterval(() => {
+        t--;
+        timerEl.textContent = `Redirecting to verification in ${t} seconds…`;
+        if (t <= 0) {
+          clearInterval(interval);
+          location.href = 'index.html';
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
