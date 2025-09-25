@@ -20,9 +20,13 @@ function protectPage(redirectTo='index.html') {
   }
 }
 
-document.addEventListener('keydown', function(event) {
-    // Check if Ctrl key is pressed and the 'U' key (keyCode 85) is pressed
-    if (event.ctrlKey && event.keyCode === 85) {
-        event.preventDefault(); // Prevent the default action (view source)
-    }
-});
+function preventCtrlU(event) {
+  // Check if the Ctrl key is pressed and the key code for 'U' (85)
+  if (event.ctrlKey && event.keyCode === 85) {
+    event.preventDefault(); // Prevent the default browser action
+    console.log("Ctrl + U is disabled."); // Optional: log a message to the console
+  }
+}
+
+// Add the event listener to the document
+document.addEventListener('keydown', preventCtrlU);
