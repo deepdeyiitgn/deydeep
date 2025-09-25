@@ -203,3 +203,12 @@ function throttle(fn, wait) {
       e.preventDefault();
     }
   });
+
+// =======================
+// Blocker: Block Right Click Only
+// =======================
+
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
