@@ -19,3 +19,10 @@ function protectPage(redirectTo='index.html') {
     window.location.href = redirectTo;
   }
 }
+
+document.addEventListener('keydown', function(event) {
+    // Check if Ctrl key is pressed and the 'U' key (keyCode 85) is pressed
+    if (event.ctrlKey && event.keyCode === 85) {
+        event.preventDefault(); // Prevent the default action (view source)
+    }
+});
