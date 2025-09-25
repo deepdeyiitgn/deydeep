@@ -1,0 +1,6 @@
+<script src="verify.js"></script>
+<script>
+  protectPage(); // agar user verified nahi hai, redirect index.html
+</script>
+
+// add this file, on every html file's body or head area
