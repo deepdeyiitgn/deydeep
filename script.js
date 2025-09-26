@@ -194,56 +194,122 @@ function throttle(fn, wait) {
 }
 
 // =======================
-// Blocker: Block CTRL + U
-// =======================
-  document.addEventListener('keydown', function(e) {
-    // Check if the Ctrl key is pressed and the key is 'u'
-    if (e.ctrlKey && e.key === 'u') {
-      // Prevent the default action (opening the source view)
-      e.preventDefault();
-    }
-  });
-
-// =======================
-// Blocker: Block Right Click Only
-// =======================
-
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
-
-// =======================
-// Blocker: Ctrl + A, C, V, X, U with Top Alert
+// Blocker:
 // =======================
 document.addEventListener('DOMContentLoaded', function() {
+    // ==========================
+    // Config
+    // ==========================
+    const blockedCtrlKeys = ['a', 'c', 'v', 'x', 'u']; // Ctrl shortcuts to block
+
+    // ==========================
+    // Common function: show error overlay
+    // ==========================
+    function showErrorOverlay(message) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0,0,0,0.85)';
+        overlay.style.color = '#fff';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.fontSize = '2em';
+        overlay.style.fontFamily = 'Arial, sans-serif';
+        overlay.style.zIndex = 99999;
+        overlay.textContent = message || '🚫 Action is blocked!';
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.remove(), 2000);
+    }
+
+    // ==========================
+    // Ctrl key blocking
+    // ==========================
     document.addEventListener('keydown', function(e) {
-        const blockedKeys = ['a', 'c', 'v', 'x', 'u']; // keys to block with Ctrl
-        if (e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
+        if (e.ctrlKey && blockedCtrlKeys.includes(e.key.toLowerCase())) {
             e.preventDefault();
+            showErrorOverlay(`🚫 Ctrl+${e.key.toUpperCase()} is blocked!`);
+        }
 
-            // Create alert div
-            const alertDiv = document.createElement('div');
-            alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
-            alertDiv.style.position = 'fixed';
-            alertDiv.style.top = '20px';
-            alertDiv.style.right = '20px';
-            alertDiv.style.background = 'rgba(255,0,0,0.9)';
-            alertDiv.style.color = '#fff';
-            alertDiv.style.padding = '10px 15px';
-            alertDiv.style.borderRadius = '5px';
-            alertDiv.style.fontFamily = 'Arial, sans-serif';
-            alertDiv.style.zIndex = 9999;
-            alertDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            alertDiv.style.transition = 'opacity 0.5s';
-            document.body.appendChild(alertDiv);
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            showErrorOverlay('🚫 F12 is blocked!');
+        }
 
-            // Fade out after 1.5 seconds
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 500);
-            }, 1500);
+        // Ctrl+Shift+I
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i') {
+            e.preventDefault();
+            showErrorOverlay('🚫 Dev Tools are blocked!');
         }
     });
+
+    // ==========================
+    // Right-click disable
+    // ==========================
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showErrorOverlay('🚫 Right-click is blocked!');
+    });
+
+    // ==========================
+    // Text selection disable
+    // ==========================
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        showErrorOverlay('🚫 Text selection is blocked!');
+    });
 });
+
+
+// =========================
+// Drag Protection Module
+// =========================
+const dragProtection = {
+    enabled: true, // true = block drag, false = allow drag
+    init: function() {
+        if (!this.enabled) return;
+
+        // Detect drag start
+        document.addEventListener('mousedown', this.handleMouseDown);
+    },
+    handleMouseDown: function(e) {
+        if (e.button === 0) { // Left mouse button
+            e.preventDefault();
+
+            // Show error overlay
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(0,0,0,0.85)';
+            overlay.style.color = '#fff';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.fontSize = '2em';
+            overlay.style.fontFamily = 'Arial, sans-serif';
+            overlay.style.zIndex = 99999;
+            overlay.textContent = '🚫 Dragging is disabled!';
+            document.body.appendChild(overlay);
+
+            // Remove overlay after 2 seconds
+            setTimeout(() => {
+                overlay.remove();
+            }, 2000);
+        }
+    },
+    toggle: function(state) {
+        this.enabled = state;
+    }
+};
+
+// Initialize the drag protection
+dragProtection.init();
 
 
