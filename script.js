@@ -212,3 +212,35 @@ function throttle(fn, wait) {
     e.preventDefault();
   });
 
+// =======================
+// Blocker: Block CTRL + C
+// =======================
+  document.addEventListener('keydown', function(e) {
+    // Check if the Ctrl key is pressed and the key is 'u'
+    if (e.ctrlKey && e.key === 'c') {
+      // Prevent the default action (opening the source view)
+      e.preventDefault();
+    }
+  });
+
+  // =======================
+// Blocker: Block CTRL + A
+// =======================
+  document.addEventListener('keydown', function(e) {
+    // Check if the Ctrl key is pressed and the key is 'u'
+    if (e.ctrlKey && e.key === 'a') {
+      // Prevent the default action (opening the source view)
+      e.preventDefault();
+    }
+  });
+
+  // =======================
+// Blocker: Block CTRL + V
+// =======================
+  document.addEventListener('keydown', function(e) {
+    // Check if the Ctrl key is pressed and the key is 'u'
+    if (e.ctrlKey && e.key === 'v') {
+      // Prevent the default action (opening the source view)
+      e.preventDefault();
+    }
+  });
