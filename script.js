@@ -198,118 +198,40 @@ function throttle(fn, wait) {
 // =======================
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ==========================
-    // Config
-    // ==========================
-    const blockedCtrlKeys = ['a', 'c', 'v', 'x', 'u']; // Ctrl shortcuts to block
-    const toastDuration = 1500; // milliseconds
-
-    // ==========================
-    // Common function: show toast
-    // ==========================
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.style.position = 'fixed';
-        toast.style.top = '20px';
-        toast.style.right = '20px';
-        toast.style.background = 'rgba(255,0,0,0.9)';
-        toast.style.color = '#fff';
-        toast.style.padding = '10px 15px';
-        toast.style.borderRadius = '5px';
-        toast.style.fontFamily = 'Arial, sans-serif';
-        toast.style.fontSize = '1em';
-        toast.style.zIndex = 9999;
-        toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        toast.style.transition = 'opacity 0.5s';
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 500);
-        }, toastDuration);
-    }
-
-    // ==========================
-    // Ctrl key blocking
-    // ==========================
     document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && blockedCtrlKeys.includes(e.key.toLowerCase())) {
+        const blockedKeys = ['a', 'c', 'v', 'x', 'u']; // keys to block with Ctrl
+        if (e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
             e.preventDefault();
-            showToast(`🚫 Ctrl+${e.key.toUpperCase()} is blocked!`);
+
+            // Create alert div
+            const alertDiv = document.createElement('div');
+            alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.background = 'rgba(255,0,0,0.9)';
+            alertDiv.style.color = '#fff';
+            alertDiv.style.padding = '10px 15px';
+            alertDiv.style.borderRadius = '5px';
+            alertDiv.style.fontFamily = 'Arial, sans-serif';
+            alertDiv.style.zIndex = 9999;
+            alertDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+            alertDiv.style.transition = 'opacity 0.5s';
+            document.body.appendChild(alertDiv);
+
+            // Fade out after 1.5 seconds
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 1500);
         }
-
-        // F12
-        if (e.key === 'F12') {
-            e.preventDefault();
-            showToast('🚫 F12 is blocked!');
-        }
-
-        // Ctrl+Shift+I
-        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i') {
-            e.preventDefault();
-            showToast('🚫 Dev Tools are blocked!');
-        }
-    });
-
-    // ==========================
-    // Right-click disable
-    // ==========================
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        showToast('🚫 Right-click is blocked!');
-    });
-
-    // ==========================
-    // Text selection disable
-    // ==========================
-    document.addEventListener('selectstart', function(e) {
-        e.preventDefault();
-        showToast('🚫 Text selection is blocked!');
     });
 });
 
-// =========================
-// Drag Protection Module
-// =========================
-const dragProtection = {
-    enabled: true, // true = block drag, false = allow drag
-    init: function() {
-        if (!this.enabled) return;
-        document.addEventListener('dragstart', this.handleDragStart);
-    },
-    handleDragStart: function(e) {
-        if (!dragProtection.enabled) return;
+// =======================
+// Blocker: Block Right Click Only
+// =======================
 
-        // Block the drag but do NOT prevent normal click
-        e.stopPropagation(); // stops drag propagation
-
-        // Show top-right toast
-        const toast = document.createElement('div');
-        toast.textContent = '🚫 Dragging is blocked!';
-        toast.style.position = 'fixed';
-        toast.style.top = '20px';
-        toast.style.right = '20px';
-        toast.style.background = 'rgba(255,0,0,0.9)';
-        toast.style.color = '#fff';
-        toast.style.padding = '10px 15px';
-        toast.style.borderRadius = '5px';
-        toast.style.fontFamily = 'Arial, sans-serif';
-        toast.style.fontSize = '1em';
-        toast.style.zIndex = 9999;
-        toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        toast.style.transition = 'opacity 0.5s';
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 500);
-        }, 1500);
-    },
-    toggle: function(state) {
-        this.enabled = state;
-    }
-};
-
-// Initialize drag protection
-dragProtection.init();
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
