@@ -215,32 +215,35 @@ function throttle(fn, wait) {
 // =======================
 // Blocker: Ctrl + A, C, V, X, U with Top Alert
 // =======================
-document.addEventListener('keydown', function(e) {
-    const blockedKeys = ['a', 'c', 'v', 'x', 'u']; // keys to block with Ctrl
-    if (e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
-        e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('keydown', function(e) {
+        const blockedKeys = ['a', 'c', 'v', 'x', 'u']; // keys to block with Ctrl
+        if (e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
+            e.preventDefault();
 
-        // Create alert div
-        const alertDiv = document.createElement('div');
-        alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
-        alertDiv.style.position = 'fixed';
-        alertDiv.style.top = '20px';
-        alertDiv.style.right = '20px';
-        alertDiv.style.background = 'rgba(255,0,0,0.9)';
-        alertDiv.style.color = '#fff';
-        alertDiv.style.padding = '10px 15px';
-        alertDiv.style.borderRadius = '5px';
-        alertDiv.style.fontFamily = 'Arial, sans-serif';
-        alertDiv.style.zIndex = 9999;
-        alertDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        alertDiv.style.transition = 'opacity 0.5s';
-        document.body.appendChild(alertDiv);
+            // Create alert div
+            const alertDiv = document.createElement('div');
+            alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.background = 'rgba(255,0,0,0.9)';
+            alertDiv.style.color = '#fff';
+            alertDiv.style.padding = '10px 15px';
+            alertDiv.style.borderRadius = '5px';
+            alertDiv.style.fontFamily = 'Arial, sans-serif';
+            alertDiv.style.zIndex = 9999;
+            alertDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+            alertDiv.style.transition = 'opacity 0.5s';
+            document.body.appendChild(alertDiv);
 
-        // Fade out after 1.5 seconds
-        setTimeout(() => {
-            alertDiv.style.opacity = '0';
-            setTimeout(() => alertDiv.remove(), 500);
-        }, 1500);
-    }
+            // Fade out after 1.5 seconds
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 1500);
+        }
+    });
 });
+
 
