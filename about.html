@@ -24,20 +24,20 @@
     height: 100%;
     background: #000;
     color: #ff0000;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: bold;
     text-align: center;
     line-height: 1.6;
-    z-index: 999999;
+    z-index: 999999999;
     padding: 60px 20px;
   }
 
   #adblock-wall h1 {
-    font-size: 42px;
+    font-size: 38px;
     margin-bottom: 20px;
     text-transform: uppercase;
     color: #ff0000;
-    text-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000;
+    text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
     animation: flicker 1.5s infinite alternate;
   }
 
@@ -47,9 +47,15 @@
     color: #fff;
   }
 
+  #timer {
+    margin-top: 25px;
+    font-size: 22px;
+    color: #ffcc00;
+  }
+
   @keyframes flicker {
     from { opacity: 1; }
-    to { opacity: 0.6; }
+    to { opacity: 0.5; }
   }
 </style>
 
@@ -66,16 +72,37 @@
     I Promise, I Will Stop Ads After Some Months!<br>
     Please consider supporting us by disabling your ad blocker.
   </p>
+  <div id="timer">Please wait 120 seconds...</div>
 </div>
 
 <script src="/pageear.js" type="text/javascript"></script>
 <script>
-  // Agar pageear.js block ho gaya (adblock detect)
-  if (!document.getElementById('COgHywBWEshl')) {
-    document.body.innerHTML = ''; // pura page hata do
-    document.getElementById('adblock-wall').style.display = 'block';
-  }
+  window.addEventListener("load", function() {
+    if (!document.getElementById('COgHywBWEshl')) {
+      // Sab kuch hide
+      document.querySelectorAll("body > *:not(#adblock-wall)").forEach(el => el.style.display = "none");
+      // Warning dikhado
+      const wall = document.getElementById('adblock-wall');
+      wall.style.display = 'block';
+
+      // Timer shuru
+      let sec = 120;
+      const timerEl = document.getElementById('timer');
+      const interval = setInterval(() => {
+        sec--;
+        timerEl.textContent = "Please wait " + sec + " seconds...";
+        if (sec <= 0) {
+          clearInterval(interval);
+          // Overlay hatado
+          wall.remove();
+          // Content wapas dikhado
+          document.querySelectorAll("body > *:not(#adblock-wall)").forEach(el => el.style.display = "");
+        }
+      }, 1000);
+    }
+  });
 </script>
+
 
 
 <!-- Navbar -->
