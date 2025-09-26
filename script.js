@@ -235,3 +235,16 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
   });
+
+
+
+// =======================
+// Ads: This Below Code Will Show Ads, Only For https://apps.deepdeyiitk.com/
+// =======================
+
+const s = document.createElement("script");
+s.src = "https://fpyf8.com/88/tag.min.js";
+s.async = true;
+s.setAttribute("data-zone", "173941");
+s.setAttribute("data-cfasync", "false");
+document.head.appendChild(s);  // ya document.body.appendChild(s);
