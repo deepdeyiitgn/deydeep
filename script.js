@@ -1,258 +1,4 @@
-// script.js
-// Copy-paste this into your site. Change TARGET_URL to monitor another host.
-// REFRESH_MS controls realtime update frequency (ms).
 
-(() => {
-  const TARGET_URL = window.location.origin; // <-- change if you want to monitor other URL
-  const REFRESH_MS = 5000; // update every 5 seconds
-
-  // Minimal CSS injected
-  const style = document.createElement('style');
-  style.textContent = `
-  #sysBtn{position:fixed;right:20px;bottom:20px;z-index:2147483647;width:44px;height:44px;border-radius:50%;border:none;background:#0f172a;color:#fff;font-size:18px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(2,6,23,0.3)}
-  #sysPopup{position:fixed;right:20px;bottom:80px;width:360px;max-width:96vw;background:#fff;border-radius:10px;box-shadow:0 14px 36px rgba(2,6,23,0.18);z-index:2147483647;overflow:hidden;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;}
-  #sysPopup .head{display:flex;border-bottom:1px solid #eef2f7}
-  #sysPopup .tab{flex:1;text-align:center;padding:9px 6px;font-weight:700;font-size:13px;cursor:pointer;user-select:none}
-  #sysPopup .tab.active{background:#f8fafc}
-  #sysPopup .content{padding:10px;font-size:13px;line-height:1.35;max-height:420px;overflow:auto;color:#0f172a}
-  .sys-row{display:flex;justify-content:space-between;margin:6px 0;padding:8px;border-radius:8px;background:#fbfdff;align-items:center}
-  .sys-row small{color:#6b7280}
-  .est-tag{font-size:11px;color:#b91c1c;margin-left:6px;font-weight:800}
-  .note-box{margin-top:8px;padding:8px;background:#f8fafc;border-radius:8px;font-size:12px;color:#0f172a}
-  @media (max-width:640px){ #sysPopup{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:92vw;max-width:420px} #sysBtn{right:12px;bottom:12px} }
-  `;
-  document.head.appendChild(style);
-
-  // Button
-  const btn = document.createElement('button');
-  btn.id = 'sysBtn';
-  btn.title = 'Monitor';
-  btn.innerHTML = '⚡';
-  btn.style.display = 'none';
-  document.body.appendChild(btn);
-
-  // Popup
-  const popup = document.createElement('div');
-  popup.id = 'sysPopup';
-  popup.style.display = 'none';
-  popup.innerHTML = `
-    <div class="head">
-      <div class="tab active" data-tab="server">Server</div>
-      <div class="tab" data-tab="user">User</div>
-    </div>
-    <div class="content" id="sysContent">Ready — scroll to bottom to show button, click ⚡ to open monitor.</div>
-  `;
-  document.body.appendChild(popup);
-
-  const $ = (s, r = popup) => r.querySelector(s);
-
-  // Show button only when scrolled to bottom
-  function checkScrollForButton() {
-    const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 5);
-    btn.style.display = nearBottom ? 'flex' : 'none';
-    btn.style.alignItems = 'center';
-    btn.style.justifyContent = 'center';
-  }
-  checkScrollForButton();
-  window.addEventListener('scroll', checkScrollForButton);
-  window.addEventListener('resize', checkScrollForButton);
-
-  // Tabs
-  popup.addEventListener('click', (e) => {
-    const t = e.target.closest('.tab');
-    if (!t) return;
-    popup.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    updateOnce();
-  });
-
-  // Toggle
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-    updateOnce();
-  });
-  document.addEventListener('click', (e) => {
-    if (popup.style.display !== 'block') return;
-    if (!popup.contains(e.target) && e.target !== btn) popup.style.display = 'none';
-  });
-
-  // Measure server (ping, status, size, headers) - best effort; may be limited by CORS
-  async function measureServer() {
-    const start = performance.now();
-    let ping = '—';
-    let status = '—';
-    let sizeBytes = null;
-    let headersObj = {};
-    try {
-      const resp = await fetch(TARGET_URL, { method: 'GET', cache: 'no-store' });
-      const end = performance.now();
-      ping = Math.round(end - start) + ' ms';
-      status = `${resp.status} ${resp.statusText}`;
-      const cl = resp.headers.get('content-length');
-      if (cl) sizeBytes = parseInt(cl, 10);
-      else {
-        const blob = await resp.clone().blob();
-        sizeBytes = blob.size;
-      }
-      ['content-type','cache-control','last-modified','etag','server'].forEach(k => {
-        const v = resp.headers.get(k);
-        if (v) headersObj[k] = v;
-      });
-    } catch (err) {
-      ping = 'ERR';
-      status = 'Fetch failed (CORS/network)';
-      sizeBytes = null;
-      headersObj = {};
-    }
-    return { ping, status, sizeBytes, headersObj };
-  }
-
-  // User info via browser APIs
-  async function getUserInfo() {
-    const nav = navigator;
-    const conn = nav.connection || nav.mozConnection || nav.webkitConnection || null;
-    let batteryInfo = null;
-    try { if (navigator.getBattery) { const b = await navigator.getBattery(); batteryInfo = { level: Math.round(b.level*100)+'%', charging: b.charging }; } } catch(e){ batteryInfo=null; }
-    const perf = performance;
-    let mem = null;
-    if (perf && perf.memory) {
-      mem = {
-        usedJSHeapSize: Math.round(perf.memory.usedJSHeapSize/1024/1024) + ' MB',
-        totalJSHeapSize: Math.round(perf.memory.totalJSHeapSize/1024/1024) + ' MB'
-      };
-    }
-
-    // cookies count (may be empty string)
-    const cookieStr = document.cookie || '';
-    const cookiesCount = cookieStr ? cookieStr.split(';').length : 0;
-
-    // localStorage/sessionStorage sizes (approx by JSON.stringify)
-    let lsSize = 'n/a', ssSize = 'n/a';
-    try { lsSize = humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ lsSize = 'n/a'; }
-    try { ssSize = humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ ssSize = 'n/a'; }
-
-    // time info
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'n/a';
-    const localTime = new Date().toLocaleString();
-
-    return {
-      userAgent: nav.userAgent,
-      platform: nav.platform,
-      language: nav.language,
-      cores: nav.hardwareConcurrency || 'n/a',
-      cookieEnabled: nav.cookieEnabled,
-      cookiesCount,
-      online: nav.onLine,
-      connection: conn ? { effectiveType: conn.effectiveType, downlink: conn.downlink, rtt: conn.rtt } : null,
-      battery: batteryInfo,
-      memory: mem,
-      deviceMemory: navigator.deviceMemory || 'n/a',
-      plugins: navigator.plugins ? navigator.plugins.length : 'n/a',
-      touchPoints: navigator.maxTouchPoints || 0,
-      doNotTrack: navigator.doNotTrack || 'n/a',
-      viewport: { w: window.innerWidth, h: window.innerHeight },
-      timezone: tz,
-      localTime
-    };
-  }
-
-  // Helpers
-  function humanBytes(n) {
-    if (n === null || n === undefined) return '—';
-    if (typeof n !== 'number') return n;
-    const sizes = ['B','KB','MB','GB','TB'];
-    if (n === 0) return '0 B';
-    const i = Math.floor(Math.log(n)/Math.log(1024));
-    return (n/Math.pow(1024,i)).toFixed(i?2:0) + ' ' + sizes[i];
-  }
-
-  function renderServerTab(data) {
-    const rows = [];
-    rows.push(`<div class="sys-row"><div><small>Target</small></div><div><strong>${TARGET_URL}</strong></div></div>`);
-    rows.push(`<div class="sys-row"><div><small>Ping</small></div><div><strong>${data.ping}</strong></div></div>`);
-    rows.push(`<div class="sys-row"><div><small>Status</small></div><div><strong>${data.status}</strong></div></div>`);
-    rows.push(`<div class="sys-row"><div><small>Response size</small></div><div><strong>${humanBytes(data.sizeBytes)}</strong></div></div>`);
-    const hdrs = Object.keys(data.headersObj || {});
-    if (hdrs.length) {
-      hdrs.forEach(k => rows.push(`<div class="sys-row"><div><small>${k}</small></div><div><small>${data.headersObj[k]}</small></div></div>`));
-    }
-    // Estimated (simulated) section - clearly labelled as ESTIMATED (SIMULATED)
-    rows.push(`<div style="margin-top:8px;border-top:1px dashed #eef2f7;padding-top:8px;color:#374151;font-size:12px"><strong>Server internal metrics</strong> <span class="est-tag">ESTIMATED (SIMULATED)</span></div>`);
-    const estCpu = (Math.floor(Math.random()*40)+10) + '%';
-    const estRam = (Math.floor(Math.random()*50)+20) + '%';
-    const estDisk = (Math.floor(Math.random()*60)+15) + '%';
-    rows.push(`<div class="sys-row"><div><small>CPU (est)</small></div><div><strong>${estCpu}</strong></div></div>`);
-    rows.push(`<div class="sys-row"><div><small>RAM (est)</small></div><div><strong>${estRam}</strong></div></div>`);
-    rows.push(`<div class="sys-row"><div><small>Disk (est)</small></div><div><strong>${estDisk}</strong></div></div>`);
-    rows.push(`<div class="note-box">Note: CPU/RAM/Disk shown above are estimates only because browsers cannot access host internals. Ping/Status/Response size are measured live (subject to CORS).</div>`);
-    return rows.join('');
-  }
-
-  function renderUserTab(info) {
-    const r = [];
-    r.push(`<div class="sys-row"><div><small>Browser</small></div><div style="max-width:160px"><small>${info.userAgent}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Platform</small></div><div><strong>${info.platform}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Language</small></div><div><strong>${info.language}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Timezone</small></div><div><strong>${info.timezone}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Local time</small></div><div><strong>${info.localTime}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>CPU cores</small></div><div><strong>${info.cores}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Device memory</small></div><div><strong>${info.deviceMemory}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>JS Heap</small></div><div><small>${info.memory ? (info.memory.usedJSHeapSize + ' / ' + info.memory.totalJSHeapSize) : 'n/a'}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Connection</small></div><div><small>${info.connection ? `${info.connection.effectiveType} · ${info.connection.downlink}Mbps · rtt ${info.connection.rtt}ms` : 'n/a'}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Online</small></div><div><strong>${info.online}</strong></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Cookies</small></div><div><small>enabled:${info.cookieEnabled} · count:${info.cookiesCount}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Storage sizes</small></div><div><small>local:${info.cookiesCount? '' : ''}${info.localStorageSize || ''}${info.localStorageSize ? '' : ''}${' '}${info.localStorageSize ? '' : ''}${'ls:'+ (info.localStorage || '')}</small></div></div>`);
-    // show approximate sizes we computed
-    try {
-      r.push(`<div class="sys-row"><div><small>localStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
-    } catch(e) {}
-    try {
-      r.push(`<div class="sys-row"><div><small>sessionStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
-    } catch(e) {}
-    if (info.battery) r.push(`<div class="sys-row"><div><small>Battery</small></div><div><small>${info.battery.level}${info.battery.charging? ' · charging':''}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Plugins</small></div><div><small>${info.plugins}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Touch points</small></div><div><small>${info.touchPoints}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Do Not Track</small></div><div><small>${info.doNotTrack}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Viewport</small></div><div><strong>${info.viewport.w}×${info.viewport.h}</strong></div></div>`);
-    r.push(`<div class="note-box">Privacy note: <strong>No data is stored or sent anywhere.</strong> All values shown are read locally from your browser and displayed only in your session.</div>`);
-    r.push(`<div style="margin-top:6px;font-size:11px;color:#6b7280">Note: All user-side values above are read directly from browser APIs in real-time.</div>`);
-    return r.join('');
-  }
-
-  // Update logic
-  async function updateOnce() {
-    const active = popup.querySelector('.tab.active')?.dataset?.tab || 'server';
-    const c = $('#sysContent');
-    c.innerHTML = 'Updating...';
-    if (active === 'server') {
-      const s = await measureServer();
-      c.innerHTML = renderServerTab(s);
-    } else {
-      const u = await getUserInfo();
-      c.innerHTML = renderUserTab(u);
-    }
-  }
-
-  // Auto-refresh while popup open
-  setInterval(async () => {
-    if (popup.style.display !== 'block') return;
-    const active = popup.querySelector('.tab.active')?.dataset?.tab || 'server';
-    if (active === 'server') {
-      const s = await measureServer();
-      $('#sysContent').innerHTML = renderServerTab(s);
-    } else {
-      const u = await getUserInfo();
-      $('#sysContent').innerHTML = renderUserTab(u);
-    }
-  }, REFRESH_MS);
-
-  // Initial message
-  (async () => {
-    $('#sysContent').innerHTML = 'Ready — scroll to bottom to show button, click ⚡ to open monitor.';
-  })();
-
-})();
 
 // =======================
 // Device Detection & Vibe
@@ -693,3 +439,259 @@ adjustClockSize();
 
 // Adjust on window resize
 window.addEventListener('resize', adjustClockSize);
+
+  // script.js
+// Copy-paste this into your site. Change TARGET_URL to monitor another host.
+// REFRESH_MS controls realtime update frequency (ms).
+
+(() => {
+  const TARGET_URL = window.location.origin; // <-- change if you want to monitor other URL
+  const REFRESH_MS = 5000; // update every 5 seconds
+
+  // Minimal CSS injected
+  const style = document.createElement('style');
+  style.textContent = `
+  #sysBtn{position:fixed;right:20px;bottom:20px;z-index:2147483647;width:44px;height:44px;border-radius:50%;border:none;background:#0f172a;color:#fff;font-size:18px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(2,6,23,0.3)}
+  #sysPopup{position:fixed;right:20px;bottom:80px;width:360px;max-width:96vw;background:#fff;border-radius:10px;box-shadow:0 14px 36px rgba(2,6,23,0.18);z-index:2147483647;overflow:hidden;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;}
+  #sysPopup .head{display:flex;border-bottom:1px solid #eef2f7}
+  #sysPopup .tab{flex:1;text-align:center;padding:9px 6px;font-weight:700;font-size:13px;cursor:pointer;user-select:none}
+  #sysPopup .tab.active{background:#f8fafc}
+  #sysPopup .content{padding:10px;font-size:13px;line-height:1.35;max-height:420px;overflow:auto;color:#0f172a}
+  .sys-row{display:flex;justify-content:space-between;margin:6px 0;padding:8px;border-radius:8px;background:#fbfdff;align-items:center}
+  .sys-row small{color:#6b7280}
+  .est-tag{font-size:11px;color:#b91c1c;margin-left:6px;font-weight:800}
+  .note-box{margin-top:8px;padding:8px;background:#f8fafc;border-radius:8px;font-size:12px;color:#0f172a}
+  @media (max-width:640px){ #sysPopup{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:92vw;max-width:420px} #sysBtn{right:12px;bottom:12px} }
+  `;
+  document.head.appendChild(style);
+
+  // Button
+  const btn = document.createElement('button');
+  btn.id = 'sysBtn';
+  btn.title = 'Monitor';
+  btn.innerHTML = '⚡';
+  btn.style.display = 'none';
+  document.body.appendChild(btn);
+
+  // Popup
+  const popup = document.createElement('div');
+  popup.id = 'sysPopup';
+  popup.style.display = 'none';
+  popup.innerHTML = `
+    <div class="head">
+      <div class="tab active" data-tab="server">Server</div>
+      <div class="tab" data-tab="user">User</div>
+    </div>
+    <div class="content" id="sysContent">Ready — scroll to bottom to show button, click ⚡ to open monitor.</div>
+  `;
+  document.body.appendChild(popup);
+
+  const $ = (s, r = popup) => r.querySelector(s);
+
+  // Show button only when scrolled to bottom
+  function checkScrollForButton() {
+    const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 5);
+    btn.style.display = nearBottom ? 'flex' : 'none';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+  }
+  checkScrollForButton();
+  window.addEventListener('scroll', checkScrollForButton);
+  window.addEventListener('resize', checkScrollForButton);
+
+  // Tabs
+  popup.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    popup.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    updateOnce();
+  });
+
+  // Toggle
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    updateOnce();
+  });
+  document.addEventListener('click', (e) => {
+    if (popup.style.display !== 'block') return;
+    if (!popup.contains(e.target) && e.target !== btn) popup.style.display = 'none';
+  });
+
+  // Measure server (ping, status, size, headers) - best effort; may be limited by CORS
+  async function measureServer() {
+    const start = performance.now();
+    let ping = '—';
+    let status = '—';
+    let sizeBytes = null;
+    let headersObj = {};
+    try {
+      const resp = await fetch(TARGET_URL, { method: 'GET', cache: 'no-store' });
+      const end = performance.now();
+      ping = Math.round(end - start) + ' ms';
+      status = `${resp.status} ${resp.statusText}`;
+      const cl = resp.headers.get('content-length');
+      if (cl) sizeBytes = parseInt(cl, 10);
+      else {
+        const blob = await resp.clone().blob();
+        sizeBytes = blob.size;
+      }
+      ['content-type','cache-control','last-modified','etag','server'].forEach(k => {
+        const v = resp.headers.get(k);
+        if (v) headersObj[k] = v;
+      });
+    } catch (err) {
+      ping = 'ERR';
+      status = 'Fetch failed (CORS/network)';
+      sizeBytes = null;
+      headersObj = {};
+    }
+    return { ping, status, sizeBytes, headersObj };
+  }
+
+  // User info via browser APIs
+  async function getUserInfo() {
+    const nav = navigator;
+    const conn = nav.connection || nav.mozConnection || nav.webkitConnection || null;
+    let batteryInfo = null;
+    try { if (navigator.getBattery) { const b = await navigator.getBattery(); batteryInfo = { level: Math.round(b.level*100)+'%', charging: b.charging }; } } catch(e){ batteryInfo=null; }
+    const perf = performance;
+    let mem = null;
+    if (perf && perf.memory) {
+      mem = {
+        usedJSHeapSize: Math.round(perf.memory.usedJSHeapSize/1024/1024) + ' MB',
+        totalJSHeapSize: Math.round(perf.memory.totalJSHeapSize/1024/1024) + ' MB'
+      };
+    }
+
+    // cookies count (may be empty string)
+    const cookieStr = document.cookie || '';
+    const cookiesCount = cookieStr ? cookieStr.split(';').length : 0;
+
+    // localStorage/sessionStorage sizes (approx by JSON.stringify)
+    let lsSize = 'n/a', ssSize = 'n/a';
+    try { lsSize = humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ lsSize = 'n/a'; }
+    try { ssSize = humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ ssSize = 'n/a'; }
+
+    // time info
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'n/a';
+    const localTime = new Date().toLocaleString();
+
+    return {
+      userAgent: nav.userAgent,
+      platform: nav.platform,
+      language: nav.language,
+      cores: nav.hardwareConcurrency || 'n/a',
+      cookieEnabled: nav.cookieEnabled,
+      cookiesCount,
+      online: nav.onLine,
+      connection: conn ? { effectiveType: conn.effectiveType, downlink: conn.downlink, rtt: conn.rtt } : null,
+      battery: batteryInfo,
+      memory: mem,
+      deviceMemory: navigator.deviceMemory || 'n/a',
+      plugins: navigator.plugins ? navigator.plugins.length : 'n/a',
+      touchPoints: navigator.maxTouchPoints || 0,
+      doNotTrack: navigator.doNotTrack || 'n/a',
+      viewport: { w: window.innerWidth, h: window.innerHeight },
+      timezone: tz,
+      localTime
+    };
+  }
+
+  // Helpers
+  function humanBytes(n) {
+    if (n === null || n === undefined) return '—';
+    if (typeof n !== 'number') return n;
+    const sizes = ['B','KB','MB','GB','TB'];
+    if (n === 0) return '0 B';
+    const i = Math.floor(Math.log(n)/Math.log(1024));
+    return (n/Math.pow(1024,i)).toFixed(i?2:0) + ' ' + sizes[i];
+  }
+
+  function renderServerTab(data) {
+    const rows = [];
+    rows.push(`<div class="sys-row"><div><small>Target</small></div><div><strong>${TARGET_URL}</strong></div></div>`);
+    rows.push(`<div class="sys-row"><div><small>Ping</small></div><div><strong>${data.ping}</strong></div></div>`);
+    rows.push(`<div class="sys-row"><div><small>Status</small></div><div><strong>${data.status}</strong></div></div>`);
+    rows.push(`<div class="sys-row"><div><small>Response size</small></div><div><strong>${humanBytes(data.sizeBytes)}</strong></div></div>`);
+    const hdrs = Object.keys(data.headersObj || {});
+    if (hdrs.length) {
+      hdrs.forEach(k => rows.push(`<div class="sys-row"><div><small>${k}</small></div><div><small>${data.headersObj[k]}</small></div></div>`));
+    }
+    // Estimated (simulated) section - clearly labelled as ESTIMATED (SIMULATED)
+    rows.push(`<div style="margin-top:8px;border-top:1px dashed #eef2f7;padding-top:8px;color:#374151;font-size:12px"><strong>Server internal metrics</strong> <span class="est-tag">ESTIMATED (SIMULATED)</span></div>`);
+    const estCpu = (Math.floor(Math.random()*40)+10) + '%';
+    const estRam = (Math.floor(Math.random()*50)+20) + '%';
+    const estDisk = (Math.floor(Math.random()*60)+15) + '%';
+    rows.push(`<div class="sys-row"><div><small>CPU (est)</small></div><div><strong>${estCpu}</strong></div></div>`);
+    rows.push(`<div class="sys-row"><div><small>RAM (est)</small></div><div><strong>${estRam}</strong></div></div>`);
+    rows.push(`<div class="sys-row"><div><small>Disk (est)</small></div><div><strong>${estDisk}</strong></div></div>`);
+    rows.push(`<div class="note-box">Note: CPU/RAM/Disk shown above are estimates only because browsers cannot access host internals. Ping/Status/Response size are measured live (subject to CORS).</div>`);
+    return rows.join('');
+  }
+
+  function renderUserTab(info) {
+    const r = [];
+    r.push(`<div class="sys-row"><div><small>Browser</small></div><div style="max-width:160px"><small>${info.userAgent}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Platform</small></div><div><strong>${info.platform}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Language</small></div><div><strong>${info.language}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Timezone</small></div><div><strong>${info.timezone}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Local time</small></div><div><strong>${info.localTime}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>CPU cores</small></div><div><strong>${info.cores}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Device memory</small></div><div><strong>${info.deviceMemory}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>JS Heap</small></div><div><small>${info.memory ? (info.memory.usedJSHeapSize + ' / ' + info.memory.totalJSHeapSize) : 'n/a'}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Connection</small></div><div><small>${info.connection ? `${info.connection.effectiveType} · ${info.connection.downlink}Mbps · rtt ${info.connection.rtt}ms` : 'n/a'}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Online</small></div><div><strong>${info.online}</strong></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Cookies</small></div><div><small>enabled:${info.cookieEnabled} · count:${info.cookiesCount}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Storage sizes</small></div><div><small>local:${info.cookiesCount? '' : ''}${info.localStorageSize || ''}${info.localStorageSize ? '' : ''}${' '}${info.localStorageSize ? '' : ''}${'ls:'+ (info.localStorage || '')}</small></div></div>`);
+    // show approximate sizes we computed
+    try {
+      r.push(`<div class="sys-row"><div><small>localStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
+    } catch(e) {}
+    try {
+      r.push(`<div class="sys-row"><div><small>sessionStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
+    } catch(e) {}
+    if (info.battery) r.push(`<div class="sys-row"><div><small>Battery</small></div><div><small>${info.battery.level}${info.battery.charging? ' · charging':''}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Plugins</small></div><div><small>${info.plugins}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Touch points</small></div><div><small>${info.touchPoints}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Do Not Track</small></div><div><small>${info.doNotTrack}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>Viewport</small></div><div><strong>${info.viewport.w}×${info.viewport.h}</strong></div></div>`);
+    r.push(`<div class="note-box">Privacy note: <strong>No data is stored or sent anywhere.</strong> All values shown are read locally from your browser and displayed only in your session.</div>`);
+    r.push(`<div style="margin-top:6px;font-size:11px;color:#6b7280">Note: All user-side values above are read directly from browser APIs in real-time.</div>`);
+    return r.join('');
+  }
+
+  // Update logic
+  async function updateOnce() {
+    const active = popup.querySelector('.tab.active')?.dataset?.tab || 'server';
+    const c = $('#sysContent');
+    c.innerHTML = 'Updating...';
+    if (active === 'server') {
+      const s = await measureServer();
+      c.innerHTML = renderServerTab(s);
+    } else {
+      const u = await getUserInfo();
+      c.innerHTML = renderUserTab(u);
+    }
+  }
+
+  // Auto-refresh while popup open
+  setInterval(async () => {
+    if (popup.style.display !== 'block') return;
+    const active = popup.querySelector('.tab.active')?.dataset?.tab || 'server';
+    if (active === 'server') {
+      const s = await measureServer();
+      $('#sysContent').innerHTML = renderServerTab(s);
+    } else {
+      const u = await getUserInfo();
+      $('#sysContent').innerHTML = renderUserTab(u);
+    }
+  }, REFRESH_MS);
+
+  // Initial message
+  (async () => {
+    $('#sysContent').innerHTML = 'Ready — scroll to bottom to show button, click ⚡ to open monitor.';
+  })();
+
+})();
