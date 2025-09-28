@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd">
   <title>Human Verification • Secure Access</title>
   <link rel="stylesheet" href="verify-style.css">
-  <script src="https://fpyf8.com/88/tag.min.js" data-zone="173941" async data-cfasync="false"></script>
+
    <!-- Navaratri & Dussehra Popup | Dates: 22 Sept 2025 – 2 Oct 2025 -->
 <style>
   :root {
@@ -903,6 +903,29 @@
   <!-- Page controller -->
   <script src="main.js"></script>
 
+  <!-- Blockers (Ctrl Keys & Right Click) -->
+  
+
+   <script>
+  document.addEventListener('keydown', (e) => {
+  const blockedKeys = ['a','c','v','x','u'];
+  if(e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
+    e.preventDefault();
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
+    Object.assign(alertDiv.style, {
+      position: 'fixed', top: '20px', right: '20px', background: 'rgba(255,0,0,0.9)',
+      color: '#fff', padding: '10px 15px', borderRadius: '5px', fontFamily: 'Arial, sans-serif',
+      zIndex: 9999, boxShadow: '0 0 10px rgba(0,0,0,0.5)', transition: 'opacity 0.5s'
+    });
+    document.body.appendChild(alertDiv);
+    setTimeout(() => { alertDiv.style.opacity = '0'; setTimeout(()=>alertDiv.remove(),500); }, 1500);
+  }
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+     </script>
+ 
+  
   <!-- Footer -->
 <footer>
   <div style="margin-bottom:12px;">
