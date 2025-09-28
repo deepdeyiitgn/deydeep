@@ -142,7 +142,7 @@ function debounce(fn, delay) {
 }
 
 // =======================
-// Blockers
+// Blockers (Ctrl Keys & Right Click)
 // =======================
 document.addEventListener('keydown', (e) => {
   const blockedKeys = ['a','c','v','x','u'];
@@ -159,7 +159,6 @@ document.addEventListener('keydown', (e) => {
     setTimeout(() => { alertDiv.style.opacity = '0'; setTimeout(()=>alertDiv.remove(),500); }, 1500);
   }
 });
-
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // =======================
@@ -220,36 +219,62 @@ document.querySelectorAll('.counter').forEach(counter=>{
 });
 
 // =======================
-// Live Date & Clock in Navbar
+// Live Date & Clock (Navbar Desktop, Footer Mobile)
 // =======================
 (function(){
   const navbar = document.querySelector('.navbar');
-  if(!navbar) return;
-  const clockEl = document.createElement('div');
-  clockEl.id = 'navbarClock';
-  Object.assign(clockEl.style,{
-    fontSize:'0.9rem', color:'#ffd60a', marginLeft:'auto', padding:'0 15px',
-    fontFamily:'monospace', whiteSpace:'nowrap'
-  });
-  navbar.appendChild(clockEl);
+  const clockFooter = document.getElementById('footerClock');
+
+  const clockDesktop = document.createElement('div');
+  clockDesktop.id = 'navbarClock';
+  navbar?.appendChild(clockDesktop);
 
   function updateClock(){
-    const now=new Date();
-    const year=now.getFullYear();
-    const month=String(now.getMonth()+1).padStart(2,'0');
-    const date=String(now.getDate()).padStart(2,'0');
-    const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const day=dayNames[now.getDay()];
-    let hours=now.getHours();
-    const minutes=String(now.getMinutes()).padStart(2,'0');
-    const seconds=String(now.getSeconds()).padStart(2,'0');
-    const ampm=hours>=12?'PM':'AM';
-    hours=hours%12||12;
-    hours=String(hours).padStart(2,'0');
-    clockEl.textContent=`${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const date = String(now.getDate()).padStart(2,'0');
+    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const day = dayNames[now.getDay()];
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+    const ampm = hours>=12?'PM':'AM';
+    hours = hours%12||12;
+    hours = String(hours).padStart(2,'0');
+
+    const clockStr = `${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
+    if(clockDesktop) clockDesktop.textContent = clockStr;
+    if(clockFooter) clockFooter.textContent = clockStr;
   }
+
+  function adjustClockDisplay(){
+    if(window.innerWidth<=768){
+      clockDesktop && (clockDesktop.style.display='none');
+      clockFooter && (clockFooter.style.display='block');
+    }else{
+      clockDesktop && (clockDesktop.style.display='block');
+      clockFooter && (clockFooter.style.display='none');
+    }
+  }
+
   updateClock();
+  adjustClockDisplay();
   setInterval(updateClock,1000);
+  window.addEventListener('resize', adjustClockDisplay);
+
+  // Styling
+  if(clockDesktop){
+    Object.assign(clockDesktop.style,{
+      fontSize:'1.3rem', fontWeight:'600', color:'#ffd60a', fontFamily:'monospace', marginLeft:'auto', whiteSpace:'nowrap'
+    });
+  }
+  if(clockFooter){
+    Object.assign(clockFooter.style,{
+      fontSize:'1.2rem', fontWeight:'500', color:'#ffd60a', fontFamily:'monospace', textAlign:'center', marginTop:'12px'
+    });
+  }
 })();
 
 // =======================
@@ -273,113 +298,35 @@ toggleBtn.addEventListener('click', () => {
 });
 
 // =======================
-// Navbar & Clock Responsive
+// Navbar Logo + Deep Dey Centered
 // =======================
-(function() {
+(function(){
   const navbar = document.querySelector('.navbar');
-  if (!navbar) return;
+  if(!navbar) return;
 
   // Remove old logo if exists
-  const oldLogo = navbar.querySelector('.logo');
-  if (oldLogo) oldLogo.remove();
+  navbar.querySelector('.logo-container')?.remove();
 
-  // Create logo container
   const logoContainer = document.createElement('div');
   logoContainer.className = 'logo-container';
-  logoContainer.style.display = 'flex';
-  logoContainer.style.alignItems = 'center';
-  logoContainer.style.justifyContent = 'center';
-  logoContainer.style.gap = '12px';
-  logoContainer.style.margin = '0 auto'; // center
+  Object.assign(logoContainer.style,{
+    display:'flex', alignItems:'center', justifyContent:'center', gap:'12px', margin:'0 auto'
+  });
 
-  // Logo image
   const logoImg = document.createElement('img');
   logoImg.src = "https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd";
   logoImg.alt = "Deep Dey Logo";
   logoImg.style.width = '36px';
   logoImg.style.height = '36px';
 
-  // Logo text link
   const logoLink = document.createElement('a');
   logoLink.href = "https://apps.deepdeyiitk.com/";
   logoLink.textContent = "Deep Dey";
-  logoLink.style.textDecoration = 'none';
-  logoLink.style.color = '#3a0ca3';
-  logoLink.style.fontWeight = '700';
-  logoLink.style.fontSize = '1.8rem';
+  Object.assign(logoLink.style,{
+    textDecoration:'none', color:'#3a0ca3', fontWeight:'700', fontSize:'1.8rem'
+  });
 
-  // Append to container
   logoContainer.appendChild(logoImg);
   logoContainer.appendChild(logoLink);
-
-  // Insert at start of navbar
   navbar.insertBefore(logoContainer, navbar.firstChild);
-
-  // =======================
-  // Clock Setup
-  // =======================
-  const clockDesktop = document.getElementById('navbarClock');
-  const clockFooter = document.getElementById('footerClock');
-
-  function updateClock() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2,'0');
-    const date = String(now.getDate()).padStart(2,'0');
-    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const day = dayNames[now.getDay()];
-
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2,'0');
-    const seconds = String(now.getSeconds()).padStart(2,'0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    hours = String(hours).padStart(2,'0');
-
-    const clockStr = `${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
-
-    // Show clock on desktop navbar only
-    if (clockDesktop) clockDesktop.textContent = clockStr;
-
-    // Show clock in footer for mobile
-    if (clockFooter) clockFooter.textContent = clockStr;
-  }
-
-  function adjustClockDisplay() {
-    if (window.innerWidth <= 768) {
-      if(clockDesktop) clockDesktop.style.display = 'none';
-      if(clockFooter) clockFooter.style.display = 'block';
-    } else {
-      if(clockDesktop) clockDesktop.style.display = 'block';
-      if(clockFooter) clockFooter.style.display = 'none';
-    }
-  }
-
-  updateClock();
-  adjustClockDisplay();
-  setInterval(updateClock, 1000);
-  window.addEventListener('resize', adjustClockDisplay);
-
-  // Styling
-  if(clockDesktop) {
-    clockDesktop.style.fontSize = '1.3rem';
-    clockDesktop.style.fontWeight = '600';
-    clockDesktop.style.color = '#ffd60a';
-    clockDesktop.style.fontFamily = 'monospace';
-    clockDesktop.style.marginLeft = 'auto';
-    clockDesktop.style.whiteSpace = 'nowrap';
-  }
-  if(clockFooter) {
-    clockFooter.style.fontSize = '1.2rem';
-    clockFooter.style.fontWeight = '500';
-    clockFooter.style.color = '#ffd60a';
-    clockFooter.style.fontFamily = 'monospace';
-    clockFooter.style.textAlign = 'center';
-    clockFooter.style.marginTop = '12px';
-  }
 })();
-
-
-
-
