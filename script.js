@@ -1,5 +1,3 @@
-
-
 // =======================
 // Device Detection & Vibe
 // =======================
@@ -409,34 +407,3 @@ toggleBtn.addEventListener('click', () => {
 
   // Insert in navbar at the start
   navbar.insertBefore(logoContainer, navbar.firstChild);
-
-  // ==================
-
-
-
-// =======================
-// Responsive Clock Size
-// =======================
-function adjustClockSize() {
-  const clockEl = document.getElementById('navbarClock');
-  if (!clockEl) return;
-
-  const screenWidth = window.innerWidth;
-
-  if (screenWidth <= 768) {
-    // Mobile devices
-    clockEl.style.fontSize = '0.9rem';
-    clockEl.style.fontWeight = '500';
-  } else {
-    // Desktop/Tablet
-    clockEl.style.fontSize = '1.2rem';
-    clockEl.style.fontWeight = '600';
-  }
-}
-
-// Initial adjustment
-adjustClockSize();
-
-// Adjust on window resize
-window.addEventListener('resize', adjustClockSize);
-
