@@ -355,14 +355,14 @@ toggleBtn.addEventListener('click', () => {
 
 
 // =======================
-// Navbar Update: Center Logo & Favicon
+// Navbar Update: Center Logo & Favicon (Updated)
 // =======================
 (function() {
   const navbar = document.querySelector('.navbar');
   if (!navbar) return;
 
-  // Remove existing logo text
-  const oldLogo = navbar.querySelector('.logo');
+  // Remove existing logo text/container
+  const oldLogo = navbar.querySelector('.logo, .logo-container');
   if (oldLogo) oldLogo.remove();
 
   // Create new logo container
@@ -374,28 +374,42 @@ toggleBtn.addEventListener('click', () => {
   logoContainer.style.gap = '12px';
   logoContainer.style.margin = '0 auto'; // center
 
-  // Create logo image (favicon)
+  // -----------------------
+  // Logo image with www link
+  // -----------------------
+  const logoLinkImg = document.createElement('a');
+  logoLinkImg.href = "https://www.deepdeyiitk.com/"; // www subdomain
+  logoLinkImg.style.display = 'inline-flex';
+  logoLinkImg.style.alignItems = 'center';
+
   const logoImg = document.createElement('img');
   logoImg.src = "https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd";
   logoImg.alt = "Deep Dey Logo";
   logoImg.style.width = '36px';
   logoImg.style.height = '36px';
 
-  // Create text link
-  const logoLink = document.createElement('a');
-  logoLink.href = "https://apps.deepdeyiitk.com/";
-  logoLink.textContent = "Deep Dey";
-  logoLink.style.textDecoration = 'none';
-  logoLink.style.color = '#3a0ca3';
-  logoLink.style.fontWeight = '700';
-  logoLink.style.fontSize = '1.8rem';
+  logoLinkImg.appendChild(logoImg);
+  logoContainer.appendChild(logoLinkImg);
 
-  // Append image and text
-  logoContainer.appendChild(logoImg);
-  logoContainer.appendChild(logoLink);
+  // -----------------------
+  // Text link with apps subdomain
+  // -----------------------
+  const logoLinkText = document.createElement('a');
+  logoLinkText.href = "https://apps.deepdeyiitk.com/"; // apps subdomain
+  logoLinkText.textContent = "Deep Dey";
+  logoLinkText.style.textDecoration = 'none';
+  logoLinkText.style.color = '#3a0ca3';
+  logoLinkText.style.fontWeight = '700';
+  logoLinkText.style.fontSize = '1.8rem';
+  logoLinkText.style.display = 'flex';
+  logoLinkText.style.alignItems = 'center';
+
+  logoContainer.appendChild(logoLinkText);
 
   // Insert in navbar at the start
   navbar.insertBefore(logoContainer, navbar.firstChild);
+
+  // ==================
 
   // =======================
   // Adjust Clock Size
