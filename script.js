@@ -243,6 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Purpose: Set default favicon for all pages
 // =======================
 
+// =======================
+// Favicon Setup
+// =======================
 (function() {
   let link = document.querySelector("link[rel~='icon']");
   if (!link) {
@@ -255,89 +258,80 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 // =======================
-// Smooth Scroll & Scroll Reveal
-// =======================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelector(this.getAttribute('href')).scrollIntoView({
-      behavior: 'smooth'
-    });
-  });
-});
-
-function scrollReveal() {
-  const reveals = document.querySelectorAll('.reveal');
-  const windowHeight = window.innerHeight;
-  reveals.forEach(el => {
-    const top = el.getBoundingClientRect().top;
-    if(top < windowHeight - 100) el.classList.add('active');
-  });
-}
-window.addEventListener('scroll', throttle(scrollReveal, 200));
-
-
-// =======================
 // Back to Top Button
 // =======================
 const backTop = document.createElement('button');
 backTop.textContent = '↑';
 backTop.id = 'backTop';
-backTop.style.position = 'fixed';
-backTop.style.bottom = '20px';
-backTop.style.right = '20px';
-backTop.style.padding = '10px 15px';
-backTop.style.border = 'none';
-backTop.style.borderRadius = '5px';
-backTop.style.background = '#3a0ca3';
-backTop.style.color = '#ffd60a';
-backTop.style.cursor = 'pointer';
-backTop.style.display = 'none';
-document.body.appendChild(backTop);
-
-backTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
-window.addEventListener('scroll', () => {
-  backTop.style.display = window.scrollY > 400 ? 'block' : 'none';
+Object.assign(backTop.style, {
+  position:'fixed', bottom:'20px', right:'20px', padding:'10px 15px',
+  border:'none', borderRadius:'5px', background:'#3a0ca3', color:'#ffd60a',
+  cursor:'pointer', display:'none'
 });
+document.body.appendChild(backTop);
+backTop.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+window.addEventListener('scroll', ()=>{ backTop.style.display = window.scrollY > 400 ? 'block':'none'; });
 
 // =======================
 // Typed Text Animation
 // =======================
-const typedText = ["JEE Aspirant 2027", "Creator", "Web Developer", "Loyal"];
+const typedText = ["JEE Aspirant 2027","Creator","Web Developer","Loyal"];
 let index = 0, charIndex = 0;
-const typedEl = document.querySelector('.typed'); // add this span in hero
-
+const typedEl = document.querySelector('.typed');
 function type() {
   if(!typedEl) return;
-  typedEl.textContent = typedText[index].slice(0, charIndex++);
-  if(charIndex > typedText[index].length) {
-    charIndex = 0;
-    index = (index + 1) % typedText.length;
-    setTimeout(type, 1000);
-  } else {
-    setTimeout(type, 150);
-  }
+  typedEl.textContent = typedText[index].slice(0,charIndex++);
+  if(charIndex>typedText[index].length){ charIndex=0; index=(index+1)%typedText.length; setTimeout(type,1000);}
+  else setTimeout(type,150);
 }
 type();
 
 // =======================
 // Animated Counters
 // =======================
-document.querySelectorAll('.counter').forEach(counter => {
-  const updateCount = () => {
-    const target = +counter.dataset.target;
-    const count = +counter.innerText;
-    const increment = target / 200;
-    if(count < target) {
-      counter.innerText = Math.ceil(count + increment);
-      setTimeout(updateCount, 20);
-    } else {
-      counter.innerText = target;
-    }
+document.querySelectorAll('.counter').forEach(counter=>{
+  const updateCount=()=>{
+    const target=+counter.dataset.target;
+    const count=+counter.innerText;
+    const increment=target/200;
+    if(count<target){ counter.innerText=Math.ceil(count+increment); setTimeout(updateCount,20); }
+    else counter.innerText=target;
   };
   updateCount();
 });
 
+// =======================
+// Live Date & Clock in Navbar
+// =======================
+(function(){
+  const navbar = document.querySelector('.navbar');
+  if(!navbar) return;
+  const clockEl = document.createElement('div');
+  clockEl.id = 'navbarClock';
+  Object.assign(clockEl.style,{
+    fontSize:'0.9rem', color:'#ffd60a', marginLeft:'auto', padding:'0 15px',
+    fontFamily:'monospace', whiteSpace:'nowrap'
+  });
+  navbar.appendChild(clockEl);
+
+  function updateClock(){
+    const now=new Date();
+    const year=now.getFullYear();
+    const month=String(now.getMonth()+1).padStart(2,'0');
+    const date=String(now.getDate()).padStart(2,'0');
+    const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const day=dayNames[now.getDay()];
+    let hours=now.getHours();
+    const minutes=String(now.getMinutes()).padStart(2,'0');
+    const seconds=String(now.getSeconds()).padStart(2,'0');
+    const ampm=hours>=12?'PM':'AM';
+    hours=hours%12||12;
+    hours=String(hours).padStart(2,'0');
+    clockEl.textContent=`${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
+  }
+  updateClock();
+  setInterval(updateClock,1000);
+})();
 
 // =======================
 // Dark / Light Mode Toggle
@@ -345,51 +339,16 @@ document.querySelectorAll('.counter').forEach(counter => {
 const toggleBtn = document.createElement('button');
 toggleBtn.textContent = '🌓 Beta';
 toggleBtn.id = 'themeToggle';
-toggleBtn.style.position = 'fixed';
-toggleBtn.style.bottom = '20px';
-toggleBtn.style.left = '20px';
+Object.assign(toggleBtn.style,{
+  position:'fixed', bottom:'20px', left:'20px', padding:'10px 16px',
+  background:'#3a0ca3', color:'#ffd60a', border:'none', borderRadius:'8px',
+  fontSize:'0.95rem', fontWeight:'600', cursor:'pointer', boxShadow:'0 4px 12px rgba(0,0,0,0.3)',
+  transition:'all 0.3s ease'
+});
+toggleBtn.addEventListener('mouseenter', ()=>{ toggleBtn.style.transform='scale(1.05)'; toggleBtn.style.boxShadow='0 6px 16px rgba(0,0,0,0.4)'; });
+toggleBtn.addEventListener('mouseleave', ()=>{ toggleBtn.style.transform='scale(1)'; toggleBtn.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)'; });
 document.body.appendChild(toggleBtn);
 
 toggleBtn.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 });
-
-// =======================
-// Live Date & Clock in Header
-// =======================
-
-(function() {
-  // Create clock container
-  const header = document.querySelector('navbar'); // ya jahan show karna ho
-  if(!header) return;
-  const clockEl = document.createElement('div');
-  clockEl.id = 'headerClock';
-  clockEl.style.fontSize = '1rem';
-  clockEl.style.color = '#ffd60a'; // optional styling
-  clockEl.style.margin = '0 10px';
-  header.appendChild(clockEl);
-
-  function updateClock() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2,'0');
-    const date = String(now.getDate()).padStart(2,'0');
-    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const day = dayNames[now.getDay()];
-
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2,'0');
-    const seconds = String(now.getSeconds()).padStart(2,'0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // 0 => 12
-    hours = String(hours).padStart(2,'0');
-
-    clockEl.textContent = `${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
-  }
-
-  updateClock();
-  setInterval(updateClock, 1000);
-})();
-
-
