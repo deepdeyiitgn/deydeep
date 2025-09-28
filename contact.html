@@ -29,28 +29,72 @@
 
 <!-- Contact Hero -->
 <section class="section contact-hero" style="padding:120px 32px 80px 32px;">
-  <h1 style="font-size:3.2rem;color:#ffd60a;text-shadow:0 2px 12px #3a0ca3,0 0 8px #ffb6ea;">Contact Me</h1>
-  <p style="font-size:1.35rem;max-width:800px;margin:0 auto 24px auto;">Have a question, collaboration idea, or want to connect? Fill out the form below, reach me via social links, or check the FAQ for quick answers. <b>I love hearing from fellow learners and creators!</b></p>
+  <h1 style="font-size:3.2rem;color:#ffd60a;text-shadow:0 2px 12px #3a0ca3,0 0 8px #ffb6ea;">Get in Touch ✨</h1>
+  <p style="font-size:1.35rem;max-width:800px;margin:0 auto 24px auto;">
+    Have an idea, question, or just want to say hello? Drop your message below or reach out via my socials.  
+    <b>Let’s build something amazing together!</b>
+  </p>
 </section>
+
 
 <!-- Contact Form Section -->
 <section class="section contact-form-section">
   <div class="form-container">
-    <form action="mailto:thedeeparise@gmail.com" method="POST" enctype="text/plain" class="contact-form">
-  <label for="name">Name</label>
-  <input type="text" id="name" name="name" placeholder="Your Name" required>
+    <form id="contactForm" class="contact-form">
+      
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="Your Name" required>
 
-  <label for="email">Email</label>
-  <input type="email" id="email" name="email" placeholder="Your Email" required>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Your Email" required>
 
-  <label for="subject">Subject</label>
-  <input type="text" id="subject" name="subject" placeholder="Subject" required>
+      <label for="phone">WhatsApp Number (Optional)</label>
+      <input type="tel" id="phone" name="phone" placeholder="Your WhatsApp Number">
 
-  <label for="message">Message</label>
-  <textarea id="message" name="body" placeholder="Your Message" rows="6" required></textarea>
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" name="subject" placeholder="Subject" required>
 
-  <button type="submit" class="btn">Send Message</button>
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="Write your message here" rows="6" required></textarea>
+
+      <button type="submit" class="btn">Send Message</button>
     </form>
+  </div>
+</section>
+
+<script>
+  document.getElementById("contactForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value || "Not Provided";
+    const subject = document.getElementById("subject").value;
+    const userMessage = document.getElementById("message").value;
+
+    // Default mail body
+    const defaultMessage = `
+Hello,
+
+I hope this message finds you well. I am reaching out regarding the subject "${subject}". Please find the details below.
+
+${userMessage}
+
+I would be glad to hear back from you at your convenience. Your response will mean a lot, and I truly appreciate your time.
+
+Best Regards,  
+Name   : ${name}  
+Email  : ${email}  
+Phone  : ${phone}
+    `;
+
+    const mailtoLink = `mailto:thedeeparise@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(defaultMessage)}`;
+
+    window.location.href = mailtoLink;
+  });
+</script>
+
+  
 
 <!-- Social Links with Icons -->
 <div class="social-links" style="margin-top:32px;">
