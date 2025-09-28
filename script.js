@@ -1,5 +1,3 @@
-
-
 // =======================
 // Device Detection & Vibe
 // =======================
@@ -92,31 +90,6 @@ sections.forEach(section => {
 });
 
 // =======================
-// Device-specific Vibe: Mobile vs Desktop
-// =======================
-if (isMobile()) {
-  // Mobile: Add a subtle bounce to buttons and cards
-  document.body.classList.add('mobile-vibe');
-} else {
-  // Desktop: Add a subtle parallax effect to blobs
-  const blobs = document.querySelectorAll('.bg-blob');
-  window.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 20;
-    const y = (e.clientY / window.innerHeight - 0.5) * 20;
-    blobs.forEach((blob, i) => {
-      blob.style.transform = `translate(${x * (i+1)}px, ${y * (i+1)}px)`;
-    });
-  });
-}
-
-// =======================
-// Smooth Page Load Animation
-// =======================
-window.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('page-loaded');
-});
-
-// =======================
 // Performance Optimizations & Lag-Free Animations
 // =======================
 
@@ -141,11 +114,19 @@ function debounce(fn, delay) {
   };
 }
 
-// Use requestAnimationFrame for parallax (desktop only)
-if (!isMobile()) {
+// =======================
+// Device-specific Vibe: Mobile vs Desktop (Parallax uses requestAnimationFrame for performance)
+// This section replaces the previous duplicate logic for desktop parallax.
+// =======================
+if (isMobile()) {
+  // Mobile: Add a subtle bounce to buttons and cards
+  document.body.classList.add('mobile-vibe');
+} else {
+  // Desktop: Add a subtle parallax effect to blobs
   const blobs = document.querySelectorAll('.bg-blob');
   let mouseX = 0, mouseY = 0;
   let animating = false;
+
   window.addEventListener('mousemove', throttle((e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
     mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
@@ -154,6 +135,7 @@ if (!isMobile()) {
       requestAnimationFrame(updateBlobs);
     }
   }, 16)); // ~60fps
+
   function updateBlobs() {
     blobs.forEach((blob, i) => {
       blob.style.transform = `translate(${mouseX * (i+1)}px, ${mouseY * (i+1)}px)`;
@@ -182,17 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =======================
-// Utility: Throttle for performance
+// Smooth Page Load Animation
 // =======================
-function throttle(fn, wait) {
-  let time = Date.now();
-  return function(...args) {
-    if ((time + wait - Date.now()) < 0) {
-      fn.apply(this, args);
-      time = Date.now();
-    }
-  };
-}
+window.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('page-loaded');
+});
 
 // =======================
 // Blocker:
@@ -298,7 +274,16 @@ document.querySelectorAll('.counter').forEach(counter=>{
     if(count<target){ counter.innerText=Math.ceil(count+increment); setTimeout(updateCount,20); }
     else counter.innerText=target;
   };
-  updateCount();
+  // Use IntersectionObserver to only run when visible for performance
+  const counterObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        updateCount();
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  counterObserver.observe(counter);
 });
 
 // =======================
@@ -411,7 +396,7 @@ toggleBtn.addEventListener('click', () => {
   navbar.insertBefore(logoContainer, navbar.firstChild);
 
   // ==================
-
+})();
 
 
 // =======================
@@ -534,6 +519,7 @@ window.addEventListener('resize', adjustClockSize);
       const cl = resp.headers.get('content-length');
       if (cl) sizeBytes = parseInt(cl, 10);
       else {
+        // Need to clone for body methods like blob()
         const blob = await resp.clone().blob();
         sizeBytes = blob.size;
       }
@@ -565,14 +551,14 @@ window.addEventListener('resize', adjustClockSize);
       };
     }
 
-    // cookies count (may be empty string)
+    // cookies count
     const cookieStr = document.cookie || '';
     const cookiesCount = cookieStr ? cookieStr.split(';').length : 0;
 
     // localStorage/sessionStorage sizes (approx by JSON.stringify)
-    let lsSize = 'n/a', ssSize = 'n/a';
-    try { lsSize = humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ lsSize = 'n/a'; }
-    try { ssSize = humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ ssSize = 'n/a'; }
+    let lsSize, ssSize;
+    try { lsSize = new Blob([JSON.stringify(localStorage)]).size; } catch(e){ lsSize = 'n/a'; }
+    try { ssSize = new Blob([JSON.stringify(sessionStorage)]).size; } catch(e){ ssSize = 'n/a'; }
 
     // time info
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'n/a';
@@ -595,13 +581,15 @@ window.addEventListener('resize', adjustClockSize);
       doNotTrack: navigator.doNotTrack || 'n/a',
       viewport: { w: window.innerWidth, h: window.innerHeight },
       timezone: tz,
-      localTime
+      localTime,
+      localStorageSize: lsSize, // Added for correct use in renderUserTab
+      sessionStorageSize: ssSize // Added for correct use in renderUserTab
     };
   }
 
   // Helpers
   function humanBytes(n) {
-    if (n === null || n === undefined) return '—';
+    if (n === null || n === undefined || n === 'n/a') return '—';
     if (typeof n !== 'number') return n;
     const sizes = ['B','KB','MB','GB','TB'];
     if (n === 0) return '0 B';
@@ -644,14 +632,9 @@ window.addEventListener('resize', adjustClockSize);
     r.push(`<div class="sys-row"><div><small>Connection</small></div><div><small>${info.connection ? `${info.connection.effectiveType} · ${info.connection.downlink}Mbps · rtt ${info.connection.rtt}ms` : 'n/a'}</small></div></div>`);
     r.push(`<div class="sys-row"><div><small>Online</small></div><div><strong>${info.online}</strong></div></div>`);
     r.push(`<div class="sys-row"><div><small>Cookies</small></div><div><small>enabled:${info.cookieEnabled} · count:${info.cookiesCount}</small></div></div>`);
-    r.push(`<div class="sys-row"><div><small>Storage sizes</small></div><div><small>local:${info.cookiesCount? '' : ''}${info.localStorageSize || ''}${info.localStorageSize ? '' : ''}${' '}${info.localStorageSize ? '' : ''}${'ls:'+ (info.localStorage || '')}</small></div></div>`);
-    // show approximate sizes we computed
-    try {
-      r.push(`<div class="sys-row"><div><small>localStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(localStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
-    } catch(e) {}
-    try {
-      r.push(`<div class="sys-row"><div><small>sessionStorage size</small></div><div><small>${(function(){ try { return humanBytes(new Blob([JSON.stringify(sessionStorage)]).size); } catch(e){ return 'n/a'; } })()}</small></div></div>`);
-    } catch(e) {}
+    // Corrected storage size display
+    r.push(`<div class="sys-row"><div><small>localStorage size</small></div><div><small>${humanBytes(info.localStorageSize)}</small></div></div>`);
+    r.push(`<div class="sys-row"><div><small>sessionStorage size</small></div><div><small>${humanBytes(info.sessionStorageSize)}</small></div></div>`);
     if (info.battery) r.push(`<div class="sys-row"><div><small>Battery</small></div><div><small>${info.battery.level}${info.battery.charging? ' · charging':''}</small></div></div>`);
     r.push(`<div class="sys-row"><div><small>Plugins</small></div><div><small>${info.plugins}</small></div></div>`);
     r.push(`<div class="sys-row"><div><small>Touch points</small></div><div><small>${info.touchPoints}</small></div></div>`);
