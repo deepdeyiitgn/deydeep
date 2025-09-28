@@ -238,7 +238,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // =======================
 // Favicon Setup for All Pages
+// Author: Deep
+// Date: 28 Sep 2025
+// Purpose: Set default favicon for all pages
 // =======================
+
 (function() {
   let link = document.querySelector("link[rel~='icon']");
   if (!link) {
