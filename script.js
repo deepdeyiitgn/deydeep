@@ -353,50 +353,56 @@ toggleBtn.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 });
 
+
 // =======================
-// Navbar Update: Logo, Center Align, Clock Size
+// Navbar Update: Center Logo & Favicon
 // =======================
 (function() {
   const navbar = document.querySelector('.navbar');
-  if(!navbar) return;
+  if (!navbar) return;
 
-  // Remove existing logo text if any
-  const existingLogo = navbar.querySelector('.logo');
-  if(existingLogo) existingLogo.remove();
+  // Remove existing logo text
+  const oldLogo = navbar.querySelector('.logo');
+  if (oldLogo) oldLogo.remove();
 
-  // Create logo + text
+  // Create new logo container
+  const logoContainer = document.createElement('div');
+  logoContainer.className = 'logo-container';
+  logoContainer.style.display = 'flex';
+  logoContainer.style.alignItems = 'center';
+  logoContainer.style.justifyContent = 'center';
+  logoContainer.style.gap = '12px';
+  logoContainer.style.margin = '0 auto'; // center
+
+  // Create logo image (favicon)
+  const logoImg = document.createElement('img');
+  logoImg.src = "https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd";
+  logoImg.alt = "Deep Dey Logo";
+  logoImg.style.width = '36px';
+  logoImg.style.height = '36px';
+
+  // Create text link
   const logoLink = document.createElement('a');
-  logoLink.href = 'https://apps.deepdeyiitk.com';
-  logoLink.innerHTML = `<img src="https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd" alt="Logo" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;"> Deep Dey`;
-  logoLink.style.color = '#ffd60a';
+  logoLink.href = "https://apps.deepdeyiitk.com/";
+  logoLink.textContent = "Deep Dey";
   logoLink.style.textDecoration = 'none';
+  logoLink.style.color = '#3a0ca3';
   logoLink.style.fontWeight = '700';
-  logoLink.style.fontSize = '1.6rem';
-  logoLink.style.verticalAlign = 'middle';
+  logoLink.style.fontSize = '1.8rem';
 
-  // Insert at start of navbar
-  navbar.insertBefore(logoLink, navbar.firstChild);
+  // Append image and text
+  logoContainer.appendChild(logoImg);
+  logoContainer.appendChild(logoLink);
 
-  // Center the links container
-  const navLinks = navbar.querySelector('.nav-links');
-  if(navLinks) {
-    navLinks.style.display = 'flex';
-    navLinks.style.justifyContent = 'center';
-    navLinks.style.flexGrow = '1';
+  // Insert in navbar at the start
+  navbar.insertBefore(logoContainer, navbar.firstChild);
+
+  // =======================
+  // Adjust Clock Size
+  // =======================
+  const clockEl = document.getElementById('navbarClock');
+  if (clockEl) {
+    clockEl.style.fontSize = '1.2rem'; // bigger
+    clockEl.style.fontWeight = '600';
   }
-
-  // Adjust clock size and position
-  let clockEl = document.getElementById('navbarClock');
-  if(!clockEl) {
-    clockEl = document.createElement('div');
-    clockEl.id = 'navbarClock';
-    navbar.appendChild(clockEl);
-  }
-  clockEl.style.fontSize = '1rem'; // thoda bada
-  clockEl.style.color = '#ffd60a';
-  clockEl.style.marginLeft = 'auto';
-  clockEl.style.padding = '0 20px';
-  clockEl.style.fontFamily = 'monospace';
-  clockEl.style.whiteSpace = 'nowrap';
-
 })();
