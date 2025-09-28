@@ -19,32 +19,24 @@ if (menuToggle && navLinks) {
 }
 
 // =======================
-// Smooth Scroll for Navigation (with device-specific effect)
+// Smooth Scroll for Navigation
 // =======================
-const links = document.querySelectorAll('.navbar ul li a');
-links.forEach(link => {
+document.querySelectorAll('.navbar ul li a').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     const targetId = link.getAttribute('href');
     const targetElement = document.querySelector(targetId);
     if(targetElement) {
-      if (isMobile()) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      targetElement.scrollIntoView({ behavior: 'smooth', block: isMobile() ? 'start' : 'center' });
     } else {
-      window.location.href = targetId; // fallback for different pages
+      window.location.href = targetId;
     }
-    // Close mobile menu after click
-    if(navLinks.classList.contains('active')) {
-      navLinks.classList.remove('active');
-    }
+    if(navLinks.classList.contains('active')) navLinks.classList.remove('active');
   });
 });
 
 // =======================
-// Button Hover & Tap Animation (device-specific)
+// Button Hover & Tap Animation
 // =======================
 const buttons = document.querySelectorAll('.btn');
 buttons.forEach(button => {
@@ -70,12 +62,9 @@ buttons.forEach(button => {
 });
 
 // =======================
-// Section Fade-in Animation (Intersection Observer)
+// Section Fade-in Animation
 // =======================
 const sections = document.querySelectorAll('.section, .hero, .about-hero, .blog-hero, .contact-hero, .portfolio-hero');
-const fadeInOptions = {
-  threshold: 0.15
-};
 const fadeInOnScroll = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
     if(entry.isIntersecting) {
@@ -83,54 +72,67 @@ const fadeInOnScroll = new IntersectionObserver((entries, observer) => {
       observer.unobserve(entry.target);
     }
   });
-}, fadeInOptions);
+}, { threshold: 0.15 });
+
 sections.forEach(section => {
   section.classList.add('pre-fade');
   fadeInOnScroll.observe(section);
 });
 
 // =======================
-// Device-specific Vibe: Mobile vs Desktop
+// Desktop Parallax Blobs
 // =======================
-if (isMobile()) {
-  // Mobile: Add a subtle bounce to buttons and cards
-  document.body.classList.add('mobile-vibe');
-} else {
-  // Desktop: Add a subtle parallax effect to blobs
+if (!isMobile()) {
   const blobs = document.querySelectorAll('.bg-blob');
-  window.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 20;
-    const y = (e.clientY / window.innerHeight - 0.5) * 20;
-    blobs.forEach((blob, i) => {
-      blob.style.transform = `translate(${x * (i+1)}px, ${y * (i+1)}px)`;
-    });
-  });
+  let mouseX = 0, mouseY = 0, animating = false;
+  window.addEventListener('mousemove', throttle((e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
+    if (!animating) {
+      animating = true;
+      requestAnimationFrame(() => {
+        blobs.forEach((blob, i) => {
+          blob.style.transform = `translate(${mouseX*(i+1)}px, ${mouseY*(i+1)}px)`;
+        });
+        animating = false;
+      });
+    }
+  }, 16));
 }
 
 // =======================
-// Smooth Page Load Animation
+// Reduce motion for accessibility
 // =======================
-window.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('page-loaded');
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.body.classList.add('reduced-motion');
+  const style = document.createElement('style');
+  style.innerHTML = '* { transition: none !important; animation: none !important; }';
+  document.head.appendChild(style);
+}
+
+// =======================
+// Lazy load images
+// =======================
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+    if(img.dataset.src) img.src = img.dataset.src;
+  });
 });
 
 // =======================
-// Performance Optimizations & Lag-Free Animations
+// Throttle & Debounce Utilities
 // =======================
-
-// Throttle function for scroll/resize/mousemove
 function throttle(fn, wait) {
   let lastTime = 0;
   return function(...args) {
     const now = Date.now();
-    if (now - lastTime >= wait) {
+    if(now - lastTime >= wait) {
       lastTime = now;
       fn.apply(this, args);
     }
   };
 }
 
-// Debounce function for resize
 function debounce(fn, delay) {
   let timer = null;
   return function(...args) {
@@ -139,108 +141,26 @@ function debounce(fn, delay) {
   };
 }
 
-// Use requestAnimationFrame for parallax (desktop only)
-if (!isMobile()) {
-  const blobs = document.querySelectorAll('.bg-blob');
-  let mouseX = 0, mouseY = 0;
-  let animating = false;
-  window.addEventListener('mousemove', throttle((e) => {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
-    mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
-    if (!animating) {
-      animating = true;
-      requestAnimationFrame(updateBlobs);
-    }
-  }, 16)); // ~60fps
-  function updateBlobs() {
-    blobs.forEach((blob, i) => {
-      blob.style.transform = `translate(${mouseX * (i+1)}px, ${mouseY * (i+1)}px)`;
-    });
-    animating = false;
-  }
-}
-
-// Reduce animation for low-end devices or prefers-reduced-motion
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  document.body.classList.add('reduced-motion');
-  // Remove transitions/animations
-  const style = document.createElement('style');
-  style.innerHTML = '* { transition: none !important; animation: none !important; }';
-  document.head.appendChild(style);
-}
-
-// Lazy load images (if any)
-document.addEventListener('DOMContentLoaded', () => {
-  const lazyImgs = document.querySelectorAll('img[loading="lazy"]');
-  lazyImgs.forEach(img => {
-    if (img.dataset.src) {
-      img.src = img.dataset.src;
-    }
-  });
-});
-
 // =======================
-// Utility: Throttle for performance
+// Blockers
 // =======================
-function throttle(fn, wait) {
-  let time = Date.now();
-  return function(...args) {
-    if ((time + wait - Date.now()) < 0) {
-      fn.apply(this, args);
-      time = Date.now();
-    }
-  };
-}
-
-// =======================
-// Blocker:
-// =======================
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('keydown', function(e) {
-        const blockedKeys = ['a', 'c', 'v', 'x', 'u']; // keys to block with Ctrl
-        if (e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
-            e.preventDefault();
-
-            // Create alert div
-            const alertDiv = document.createElement('div');
-            alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
-            alertDiv.style.position = 'fixed';
-            alertDiv.style.top = '20px';
-            alertDiv.style.right = '20px';
-            alertDiv.style.background = 'rgba(255,0,0,0.9)';
-            alertDiv.style.color = '#fff';
-            alertDiv.style.padding = '10px 15px';
-            alertDiv.style.borderRadius = '5px';
-            alertDiv.style.fontFamily = 'Arial, sans-serif';
-            alertDiv.style.zIndex = 9999;
-            alertDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            alertDiv.style.transition = 'opacity 0.5s';
-            document.body.appendChild(alertDiv);
-
-            // Fade out after 1.5 seconds
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 500);
-            }, 1500);
-        }
-    });
-});
-
-// =======================
-// Blocker: Block Right Click Only
-// =======================
-
-  document.addEventListener('contextmenu', function(e) {
+document.addEventListener('keydown', (e) => {
+  const blockedKeys = ['a','c','v','x','u'];
+  if(e.ctrlKey && blockedKeys.includes(e.key.toLowerCase())) {
     e.preventDefault();
-  });
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = `🚫 Ctrl+${e.key.toUpperCase()} is blocked!`;
+    Object.assign(alertDiv.style, {
+      position: 'fixed', top: '20px', right: '20px', background: 'rgba(255,0,0,0.9)',
+      color: '#fff', padding: '10px 15px', borderRadius: '5px', fontFamily: 'Arial, sans-serif',
+      zIndex: 9999, boxShadow: '0 0 10px rgba(0,0,0,0.5)', transition: 'opacity 0.5s'
+    });
+    document.body.appendChild(alertDiv);
+    setTimeout(() => { alertDiv.style.opacity = '0'; setTimeout(()=>alertDiv.remove(),500); }, 1500);
+  }
+});
 
-// =======================
-// Favicon Setup for All Pages
-// Author: Deep
-// Date: 28 Sep 2025
-// Purpose: Set default favicon for all pages
-// =======================
+document.addEventListener('contextmenu', e => e.preventDefault());
 
 // =======================
 // Favicon Setup
@@ -352,19 +272,18 @@ toggleBtn.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 });
 
-
 // =======================
-// Navbar Update: Center Logo & Favicon (Updated)
+// Navbar & Clock Responsive
 // =======================
 (function() {
   const navbar = document.querySelector('.navbar');
   if (!navbar) return;
 
-  // Remove existing logo text/container
-  const oldLogo = navbar.querySelector('.logo, .logo-container');
+  // Remove old logo if exists
+  const oldLogo = navbar.querySelector('.logo');
   if (oldLogo) oldLogo.remove();
 
-  // Create new logo container
+  // Create logo container
   const logoContainer = document.createElement('div');
   logoContainer.className = 'logo-container';
   logoContainer.style.display = 'flex';
@@ -373,37 +292,94 @@ toggleBtn.addEventListener('click', () => {
   logoContainer.style.gap = '12px';
   logoContainer.style.margin = '0 auto'; // center
 
-  // -----------------------
-  // Logo image with www link
-  // -----------------------
-  const logoLinkImg = document.createElement('a');
-  logoLinkImg.href = "https://www.deepdeyiitk.com/"; // www subdomain
-  logoLinkImg.style.display = 'inline-flex';
-  logoLinkImg.style.alignItems = 'center';
-
+  // Logo image
   const logoImg = document.createElement('img');
   logoImg.src = "https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd";
   logoImg.alt = "Deep Dey Logo";
   logoImg.style.width = '36px';
   logoImg.style.height = '36px';
 
-  logoLinkImg.appendChild(logoImg);
-  logoContainer.appendChild(logoLinkImg);
+  // Logo text link
+  const logoLink = document.createElement('a');
+  logoLink.href = "https://apps.deepdeyiitk.com/";
+  logoLink.textContent = "Deep Dey";
+  logoLink.style.textDecoration = 'none';
+  logoLink.style.color = '#3a0ca3';
+  logoLink.style.fontWeight = '700';
+  logoLink.style.fontSize = '1.8rem';
 
-  // -----------------------
-  // Text link with apps subdomain
-  // -----------------------
-  const logoLinkText = document.createElement('a');
-  logoLinkText.href = "https://apps.deepdeyiitk.com/"; // apps subdomain
-  logoLinkText.textContent = "Deep Dey";
-  logoLinkText.style.textDecoration = 'none';
-  logoLinkText.style.color = '#3a0ca3';
-  logoLinkText.style.fontWeight = '700';
-  logoLinkText.style.fontSize = '1.8rem';
-  logoLinkText.style.display = 'flex';
-  logoLinkText.style.alignItems = 'center';
+  // Append to container
+  logoContainer.appendChild(logoImg);
+  logoContainer.appendChild(logoLink);
 
-  logoContainer.appendChild(logoLinkText);
-
-  // Insert in navbar at the start
+  // Insert at start of navbar
   navbar.insertBefore(logoContainer, navbar.firstChild);
+
+  // =======================
+  // Clock Setup
+  // =======================
+  const clockDesktop = document.getElementById('navbarClock');
+  const clockFooter = document.getElementById('footerClock');
+
+  function updateClock() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2,'0');
+    const date = String(now.getDate()).padStart(2,'0');
+    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const day = dayNames[now.getDay()];
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    hours = String(hours).padStart(2,'0');
+
+    const clockStr = `${year}/${month}/${date} ${day} || ${hours}:${minutes}:${seconds} ${ampm}`;
+
+    // Show clock on desktop navbar only
+    if (clockDesktop) clockDesktop.textContent = clockStr;
+
+    // Show clock in footer for mobile
+    if (clockFooter) clockFooter.textContent = clockStr;
+  }
+
+  function adjustClockDisplay() {
+    if (window.innerWidth <= 768) {
+      if(clockDesktop) clockDesktop.style.display = 'none';
+      if(clockFooter) clockFooter.style.display = 'block';
+    } else {
+      if(clockDesktop) clockDesktop.style.display = 'block';
+      if(clockFooter) clockFooter.style.display = 'none';
+    }
+  }
+
+  updateClock();
+  adjustClockDisplay();
+  setInterval(updateClock, 1000);
+  window.addEventListener('resize', adjustClockDisplay);
+
+  // Styling
+  if(clockDesktop) {
+    clockDesktop.style.fontSize = '1.3rem';
+    clockDesktop.style.fontWeight = '600';
+    clockDesktop.style.color = '#ffd60a';
+    clockDesktop.style.fontFamily = 'monospace';
+    clockDesktop.style.marginLeft = 'auto';
+    clockDesktop.style.whiteSpace = 'nowrap';
+  }
+  if(clockFooter) {
+    clockFooter.style.fontSize = '1.2rem';
+    clockFooter.style.fontWeight = '500';
+    clockFooter.style.color = '#ffd60a';
+    clockFooter.style.fontFamily = 'monospace';
+    clockFooter.style.textAlign = 'center';
+    clockFooter.style.marginTop = '12px';
+  }
+})();
+
+
+
+
