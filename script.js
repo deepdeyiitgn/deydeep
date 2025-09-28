@@ -236,5 +236,18 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
   });
 
+// =======================
+// Favicon Setup for All Pages
+// =======================
+(function() {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/png";
+    document.head.appendChild(link);
+  }
+  link.href = "https://www.deepdeyiitk.com/web/image/website/1/favicon?unique=e5fe8cd";
+})();
 
 
