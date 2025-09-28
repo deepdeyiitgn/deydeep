@@ -11,95 +11,22 @@
 <script>
   protectPage(); // agar user verified nahi hai, redirect index.html
 </script>
-  <script src="https://fpyf8.com/88/tag.min.js" data-zone="173941" async data-cfasync="false"></script>
-  <style>
-  #adblock-wall {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    color: #ff0000;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.6;
-    z-index: 999999999;
-    padding: 60px 20px;
-  }
 
-  #adblock-wall h1 {
-    font-size: 38px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    color: #ff0000;
-    text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
-    animation: flicker 1.5s infinite alternate;
-  }
-
-  #adblock-wall p {
-    font-size: 20px;
-    margin-top: 20px;
-    color: #fff;
-  }
-
-  #timer {
-    margin-top: 25px;
-    font-size: 22px;
-    color: #ffcc00;
-  }
-
-  @keyframes flicker {
-    from { opacity: 1; }
-    to { opacity: 0.5; }
-  }
-</style>
-
-<div id="adblock-wall">
-  <h1>⚠️ Ad Blocker Detected ⚠️</h1>
-  <p>
-    Our website is powered by ads.<br>
-    You cannot continue while AdBlock is enabled.<br><br>
-    ❌ Disable your Ad Blocker and refresh this page ❌
-  </p>
-  <p style="margin-top:40px; font-size:18px; color:#ffcc00;">
-    If You Are A Free User, Then Please Disable Ad Blocker.<br>
-    It Will Best For Me 🙏<br>
-    I Promise, I Will Stop Ads After Some Months!<br>
-    Please consider supporting us by disabling your ad blocker.
-  </p>
-  <div id="timer">Please wait 120 seconds...</div>
-</div>
-
-<script src="/pageear.js" type="text/javascript"></script>
-<script>
-  window.addEventListener("load", function() {
-    if (!document.getElementById('COgHywBWEshl')) {
-      // Sab kuch hide
-      document.querySelectorAll("body > *:not(#adblock-wall)").forEach(el => el.style.display = "none");
-      // Warning dikhado
-      const wall = document.getElementById('adblock-wall');
-      wall.style.display = 'block';
-
-      // Timer shuru
-      let sec = 120;
-      const timerEl = document.getElementById('timer');
-      const interval = setInterval(() => {
-        sec--;
-        timerEl.textContent = "Please wait " + sec + " seconds...";
-        if (sec <= 0) {
-          clearInterval(interval);
-          // Overlay hatado
-          wall.remove();
-          // Content wapas dikhado
-          document.querySelectorAll("body > *:not(#adblock-wall)").forEach(el => el.style.display = "");
-        }
-      }, 1000);
+    <style>
+ 
+        /* Hide the container by default (on all screen sizes) */
+    .hide-on-mobile {
+      display: none;
     }
-  });
-</script>
+
+    /* Make the container visible only on larger screens */
+    @media (min-width: 768px) { /* Adjust '768px' to your desired breakpoint */
+      .desktop-only-container {
+        display: block; /* Or grid, flex, etc., depending on your layout */
+      }
+    }
+  </style>
+  
 
 </head>
 <body>
@@ -156,6 +83,23 @@
   <p>Reach out via my contact page or connect on social media.</p>
   <a href="contact.html" class="btn">Contact Me</a>
 </section>
+
+   <div>
+  <p align="center">
+  <em>Made with ❤️, AI power, and relentless focus by <b>Deep Dey</b></em>
+</p>
+    </div>
+  <div>
+    <div class="hide-on-mobile desktop-only-container">
+      <!-- Content to hide on mobile -->
+       <p align="center"> 
+         <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=3000&pause=800&color=3A0CA3&center=true&vCenter=true&width=450&lines=JEE+2027+Aspirant;AI+%2B+Prompt+Engineering+Enthusiast;Web+%26+App+Innovator;Consistent+5AM+Study+Streaks" alt="Typing SVG">
+</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anuj579/Anuj579/output/github-contribution-grid-snake-dark.svg" alt="Snake animation" />
+</p>
+      </div>
+    </div>
 
 <!-- Footer -->
 <footer>
