@@ -330,3 +330,40 @@ toggleBtn.addEventListener('click', () => {
   logoContainer.appendChild(logoLink);
   navbar.insertBefore(logoContainer, navbar.firstChild);
 })();
+
+// =======================
+// Persistent Background Music
+// =======================
+
+const MUSIC_FILE = "background.mp3"; // same folder as script
+const MUSIC_KEY = "bg-music-time";
+
+// Create audio element if not already created
+if (!window.bgMusic) {
+  window.bgMusic = new Audio(`./${MUSIC_FILE}`);
+  window.bgMusic.volume = 0.7;
+  window.bgMusic.loop = true;
+
+  // Resume from saved time
+  const savedTime = localStorage.getItem(MUSIC_KEY);
+  if (savedTime) {
+    window.bgMusic.currentTime = parseFloat(savedTime);
+  }
+
+  // Save current time before leaving page
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem(MUSIC_KEY, window.bgMusic.currentTime);
+  });
+
+  // Try autoplay after user interaction
+  const startMusic = () => {
+    window.bgMusic.play().catch(() => {
+      console.log("Autoplay blocked, waiting for user action.");
+    });
+    document.removeEventListener("click", startMusic);
+    document.removeEventListener("keydown", startMusic);
+  };
+
+  document.addEventListener("click", startMusic);
+  document.addEventListener("keydown", startMusic);
+}
