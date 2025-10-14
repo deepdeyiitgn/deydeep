@@ -368,24 +368,24 @@ if (!window.bgMusic) {
   document.addEventListener("keydown", startMusic);
 }
 
-// ===============================================
-// Prevent user to use debugger on browser
-// ===============================================
-    (function() {
-        var devtools = /./;
-        devtools.toString = function() {
-            this.opened = true;
-        };
+// =========================================================
+// Prevent user to use debugger on browser [not in use now]
+// =========================================================
+ //   (function() {
+ //       var devtools = /./;
+   //     devtools.toString = function() {
+     //       this.opened = true;
+  //      };
 
-        setInterval(function() {
-            console.log(devtools); // This will trigger the toString method if devtools are open
-            if (devtools.opened) {
-                // Developer tools are open
-                alert("Warning: Developer tools are open. This website may not function correctly.");
-                // Optionally, disable further interaction or redirect
-                document.body.innerHTML = "<h1>Developer tools detected! Please close them to continue.</h1>";
-                document.body.style.pointerEvents = "none"; // Disable clicks
-                window.stop(); // Stop page loading
-            }
-        }, 1000); // Check every second
-    })();
+ //       setInterval(function() {
+ //           console.log(devtools); // This will trigger the toString method if devtools are open
+ //           if (devtools.opened) {
+ //               // Developer tools are open
+ //               alert("Warning: Developer tools are open. This website may not function correctly.");
+ //               // Optionally, disable further interaction or redirect
+ //               document.body.innerHTML = "<h1>Developer tools detected! Please close them to continue.</h1>";
+  //              document.body.style.pointerEvents = "none"; // Disable clicks
+  //              window.stop(); // Stop page loading
+  //          }
+  //      }, 1000); // Check every second
+ //   })();
